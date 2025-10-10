@@ -1,0 +1,7 @@
+{% extends "layout" %}
+{% block title %}Photos{% endblock %}
+{% block body %}
+  {% for photo in photos %}
+    <img src="/thumbnails/{{ photo.id }}.webp">
+  {% endfor %}
+{% endblock %}
