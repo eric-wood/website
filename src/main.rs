@@ -6,8 +6,10 @@ mod app_error;
 use app_error::AppError;
 mod db;
 mod photos;
+mod templates;
 use photos::Photo;
 use sqlx::SqlitePool;
+use templates::load_templates;
 use tower_http::services::ServeDir;
 
 struct AppState {
@@ -17,7 +19,7 @@ struct AppState {
 
 async fn root(State(state): State<Arc<AppState>>) -> Result<Html<String>, AppError> {
     let photos = db::get_photos(&state.pool).await?;
-    let template = state.template_env.get_template("index")?;
+    let template = state.template_env.get_template("photos/index")?;
     let rendered = template.render(context! {
         photos => photos,
     })?;
@@ -32,10 +34,7 @@ async fn main() -> anyhow::Result<()> {
         .await
         .expect("Where's the database???");
 
-    let mut template_env = Environment::new();
-    template_env.add_template("layout", include_str!("../templates/layout.jinja"))?;
-    template_env.add_template("index", include_str!("../templates/index.jinja"))?;
-
+    let template_env = load_templates()?;
     let app_state = Arc::new(AppState { template_env, pool });
     let app = Router::new()
         .route("/", get(root))
