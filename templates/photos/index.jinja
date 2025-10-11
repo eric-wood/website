@@ -2,6 +2,9 @@
 {% block title %}Photos{% endblock %}
 {% block body %}
   {% for photo in photos %}
-    <img src="/thumbnails/{{ photo.id }}.webp">
+    <div>
+      <p>{{ photo.taken_at }}</p>
+      <img src="/thumbnails/{{ photo.id }}.webp">
+    </div>
   {% endfor %}
 {% endblock %}

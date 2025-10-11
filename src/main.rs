@@ -4,6 +4,7 @@ use minijinja::{Environment, context};
 use std::{env, sync::Arc};
 mod app_error;
 use app_error::AppError;
+mod date_time;
 mod db;
 mod photos;
 mod templates;

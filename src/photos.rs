@@ -1,3 +1,5 @@
+use crate::date_time::DateTime;
+
 use serde::Serialize;
 use sqlx::FromRow;
 
@@ -6,6 +8,8 @@ pub struct Photo {
     pub id: String,
     pub caption: String,
     pub filename: String,
-    // pub taken_at TEXT,
-    // pub created_at TEXT
+    #[sqlx(try_from = "String")]
+    pub taken_at: DateTime,
+    #[sqlx(try_from = "String")]
+    pub created_at: DateTime,
 }
