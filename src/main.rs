@@ -13,13 +13,26 @@ use sqlx::SqlitePool;
 use templates::load_templates;
 use tower_http::services::ServeDir;
 
+use crate::db::{Pagination, PhotoQuery, Sort, SortDirection, SortField};
+
 struct AppState {
     template_env: Environment<'static>,
     pool: SqlitePool,
 }
 
 async fn root(State(state): State<Arc<AppState>>) -> Result<Html<String>, AppError> {
-    let photos = db::get_photos(&state.pool).await?;
+    let photos = db::get_photos(
+        &state.pool,
+        PhotoQuery {
+            sort: Sort {
+                field: SortField::TakenAt,
+                direction: SortDirection::Asc,
+            },
+            pagination: Pagination { limit: 10, page: 1 },
+            tag: Some("me".to_string()),
+        },
+    )
+    .await?;
     let template = state.template_env.get_template("photos/index")?;
     let rendered = template.render(context! {
         photos => photos,

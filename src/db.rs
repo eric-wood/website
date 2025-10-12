@@ -1,12 +1,83 @@
 use crate::Photo;
-use sqlx::SqlitePool;
+use sqlx::{QueryBuilder, Sqlite, SqlitePool, query::QueryAs};
 
-pub async fn get_photos(pool: &SqlitePool) -> anyhow::Result<Vec<Photo>> {
-    let photos = sqlx::query_as::<_, Photo>(
-        "SELECT id, caption, filename, taken_at, created_at FROM photos",
-    )
-    .fetch_all(pool)
-    .await?;
+pub enum SortDirection {
+    Asc,
+    Desc,
+}
+
+impl SortDirection {
+    pub fn to_sql(&self) -> String {
+        match self {
+            Self::Asc => "ASC",
+            Self::Desc => "DESC",
+        }
+        .to_string()
+    }
+}
+
+pub enum SortField {
+    TakenAt,
+    CreatedAt,
+}
+
+impl SortField {
+    pub fn to_sql(&self) -> String {
+        match self {
+            Self::TakenAt => "taken_at",
+            Self::CreatedAt => "created_at",
+        }
+        .to_string()
+    }
+}
+
+pub struct Sort {
+    pub direction: SortDirection,
+    pub field: SortField,
+}
+
+impl Sort {
+    pub fn to_sql(&self) -> String {
+        let field = self.field.to_sql();
+        let direction = self.direction.to_sql();
+        format!("{field} {direction}")
+    }
+}
+
+pub struct Pagination {
+    pub limit: u32,
+    pub page: u32,
+}
+
+pub struct PhotoQuery {
+    pub sort: Sort,
+    pub pagination: Pagination,
+    pub tag: Option<String>,
+}
+
+pub async fn get_photos(pool: &SqlitePool, pq: PhotoQuery) -> anyhow::Result<Vec<Photo>> {
+    let offset = pq.pagination.limit * (pq.pagination.page - 1);
+
+    let mut query: QueryBuilder<Sqlite> = QueryBuilder::new("SELECT * FROM photos ");
+
+    if let Some(tag) = pq.tag {
+        query
+            .push("JOIN photo_tags ON photo_tags.tag = ")
+            .push_bind(tag)
+            .push(" AND photo_tags.photo_id = photos.id ");
+    };
+
+    let sort_sql = pq.sort.to_sql();
+    query.push(format!("ORDER BY {sort_sql}"));
+
+    query
+        .push(" LIMIT ")
+        .push_bind(pq.pagination.limit)
+        .push(" OFFSET ")
+        .push_bind(offset);
+
+    let query: QueryAs<'_, Sqlite, Photo, _> = query.build_query_as();
+    let photos = query.fetch_all(pool).await?;
 
     Ok(photos)
 }
