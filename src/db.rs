@@ -1,4 +1,4 @@
-use crate::Photo;
+use crate::{Photo, Tag};
 use sqlx::{QueryBuilder, Sqlite, SqlitePool, query::QueryAs};
 
 pub enum SortDirection {
@@ -80,4 +80,21 @@ pub async fn get_photos(pool: &SqlitePool, pq: PhotoQuery) -> anyhow::Result<Vec
     let photos = query.fetch_all(pool).await?;
 
     Ok(photos)
+}
+
+pub async fn get_photo(pool: &SqlitePool, id: String) -> anyhow::Result<Photo> {
+    let photo: Photo = sqlx::query_as("SELECT * FROM photos WHERE id = ?")
+        .bind(id)
+        .fetch_one(pool)
+        .await?;
+
+    Ok(photo)
+}
+
+pub async fn get_tags(pool: &SqlitePool) -> anyhow::Result<Vec<Tag>> {
+    let tags: Vec<Tag> = sqlx::query_as("SELECT * FROM tags ORDER BY count DESC")
+        .fetch_all(pool)
+        .await?;
+
+    Ok(tags)
 }

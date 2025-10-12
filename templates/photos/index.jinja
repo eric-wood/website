@@ -1,6 +1,11 @@
 {% extends "layout" %}
 {% block title %}Photos{% endblock %}
 {% block body %}
+  <ul>
+  {% for tag in tags %}
+    <li>{{ tag.name }} ({{ tag.count }})</li>
+  {% endfor %}
+  </ul>
   {% for photo in photos %}
     <div>
       <p>{{ photo.taken_at }}</p>

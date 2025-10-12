@@ -13,3 +13,9 @@ pub struct Photo {
     #[sqlx(try_from = "String")]
     pub created_at: DateTime,
 }
+
+#[derive(FromRow, Serialize)]
+pub struct Tag {
+    pub name: String,
+    pub count: u32,
+}
