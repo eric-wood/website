@@ -7,9 +7,9 @@
   {% endfor %}
   </ul>
   {% for photo in photos %}
-    <div>
+    <a href="/{{ photo.id }}">
       <p>{{ photo.taken_at }}</p>
       <img src="/thumbnails/{{ photo.id }}.webp">
-    </div>
+    </a>
   {% endfor %}
 {% endblock %}

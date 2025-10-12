@@ -1,13 +1,16 @@
 use crate::{Photo, Tag};
+use serde::Deserialize;
 use sqlx::{QueryBuilder, Sqlite, SqlitePool, query::QueryAs};
 
+#[derive(Deserialize, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
 pub enum SortDirection {
     Asc,
     Desc,
 }
 
 impl SortDirection {
-    pub fn to_sql(&self) -> String {
+    pub fn to_sql(self) -> String {
         match self {
             Self::Asc => "ASC",
             Self::Desc => "DESC",
@@ -16,13 +19,15 @@ impl SortDirection {
     }
 }
 
+#[derive(Deserialize, Clone, Copy)]
+#[serde(rename_all = "snake_case")]
 pub enum SortField {
     TakenAt,
     CreatedAt,
 }
 
 impl SortField {
-    pub fn to_sql(&self) -> String {
+    pub fn to_sql(self) -> String {
         match self {
             Self::TakenAt => "taken_at",
             Self::CreatedAt => "created_at",
