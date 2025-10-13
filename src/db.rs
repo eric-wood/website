@@ -1,8 +1,8 @@
 use crate::{Photo, Tag};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::{QueryBuilder, Sqlite, SqlitePool, query::QueryAs};
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Serialize, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum SortDirection {
     Asc,
@@ -19,7 +19,7 @@ impl SortDirection {
     }
 }
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Serialize, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
 pub enum SortField {
     TakenAt,

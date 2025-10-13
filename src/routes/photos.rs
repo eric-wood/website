@@ -34,6 +34,8 @@ impl Default for IndexParams {
     }
 }
 
+static SORT_FIELDS: [SortField; 2] = [SortField::TakenAt, SortField::CreatedAt];
+
 pub async fn index(
     query: Query<IndexParams>,
     State(state): State<Arc<AppState>>,
@@ -54,11 +56,18 @@ pub async fn index(
     )
     .await?;
 
+    let current_tag = query.tag.clone();
     let tags = db::get_tags(&state.pool).await?;
+    let sort_dir = query.dir;
+    let sort_field = query.sort;
     let template = state.template_env.get_template("photos/index")?;
     let rendered = template.render(context! {
         photos => photos,
         tags => tags,
+        current_tag => current_tag,
+        sort_dir => sort_dir,
+        sort_field => sort_field,
+        sort_fields => SORT_FIELDS,
     })?;
 
     Ok(Html(rendered))

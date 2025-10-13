@@ -1,14 +1,39 @@
 {% extends "layout" %}
 {% block title %}Photos{% endblock %}
 {% block body %}
-  <ul>
-  {% for tag in tags %}
-    <li>{{ tag.name }} ({{ tag.count }})</li>
-  {% endfor %}
-  </ul>
+  <nav>
+  {{ dir }}
+    <ul>
+    {% for tag in tags %}
+      <li>
+        {% if current_tag == tag.name -%}
+          {{ tag.name }} ({{ tag.count }})
+        {% else -%}
+          <a href="?tag={{ tag.name }}">
+            {{ tag.name }} ({{ tag.count }})
+          </a>
+        {% endif %}
+      </li>
+    {% endfor %}
+    </ul>
+    <p>
+      Sort: 
+      {% if sort_dir == "asc" -%}
+        <a href="/?dir=desc">↑</a>
+      {% else -%}
+        <a href="/?dir=asc">↓</a>
+      {% endif %}
+    </p>
+    <select id="sort" name="sort">
+      {% for field in sort_fields %}
+        <option value="{{ field }}" {% if field == sort_field -%}selected="true"{% endif %}>{{ field }}</option>
+      {% endfor %}
+    </select>
+    </select>
+  </nav>
   {% for photo in photos %}
     <a href="/{{ photo.id }}">
-      <p>{{ photo.taken_at }}</p>
+      <p><time datetime="{{ photo.taken_at }}">{{ photo.taken_at }}</time></p>
       <img src="/thumbnails/{{ photo.id }}.webp">
     </a>
   {% endfor %}

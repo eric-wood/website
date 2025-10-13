@@ -32,6 +32,7 @@ async fn main() -> anyhow::Result<()> {
         .route("/", get(routes::photos::index))
         .route("/{id}", get(routes::photos::show))
         .with_state(app_state)
+        .nest_service("/assets", ServeDir::new(&env::var("ASSETS_PATH")?))
         .nest_service("/thumbnails", ServeDir::new(&env::var("THUMBNAIL_PATH")?))
         .nest_service("/images", ServeDir::new(&env::var("IMAGE_PATH")?));
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
