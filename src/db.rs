@@ -60,6 +60,13 @@ pub struct PhotoQuery {
     pub tag: Option<String>,
 }
 
+pub async fn get_photo_count(pool: &SqlitePool) -> anyhow::Result<u32> {
+    let result: (u32,) = sqlx::query_as("SELECT COUNT(*) FROM photos")
+        .fetch_one(pool)
+        .await?;
+    Ok(result.0)
+}
+
 pub async fn get_photos(pool: &SqlitePool, pq: PhotoQuery) -> anyhow::Result<Vec<Photo>> {
     let offset = pq.pagination.limit * (pq.pagination.page - 1);
 

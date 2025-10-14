@@ -5,12 +5,18 @@ use axum::{
     response::Html,
 };
 use minijinja::context;
-use serde::{self, Deserialize};
+use serde::{self, Deserialize, Serialize};
 
 use crate::{
     AppError, AppState,
-    db::{self, Pagination, PhotoQuery, Sort, SortDirection, SortField},
+    db::{self, Pagination as QueryPagination, PhotoQuery, Sort, SortDirection, SortField},
 };
+
+#[derive(Serialize)]
+pub struct Pagination {
+    page: u32,
+    num_pages: u32,
+}
 
 #[derive(Deserialize)]
 #[serde(default)]
@@ -47,7 +53,7 @@ pub async fn index(
                 field: query.sort,
                 direction: query.dir,
             },
-            pagination: Pagination {
+            pagination: QueryPagination {
                 limit: query.limit,
                 page: query.page,
             },
@@ -56,18 +62,30 @@ pub async fn index(
     )
     .await?;
 
+    let total_photos = db::get_photo_count(&state.pool).await?;
+
     let current_tag = query.tag.clone();
-    let tags = db::get_tags(&state.pool).await?;
+    let mut tags = db::get_tags(&state.pool).await?;
+    if let Some(tag) = &query.tag {
+        tags.retain(|t| t.name != *tag);
+    }
+
     let sort_dir = query.dir;
     let sort_field = query.sort;
     let template = state.template_env.get_template("photos/index")?;
+    let pagination = Pagination {
+        page: query.page,
+        num_pages: total_photos / query.limit,
+    };
     let rendered = template.render(context! {
         photos => photos,
         tags => tags,
         current_tag => current_tag,
+        current_tag => current_tag,
         sort_dir => sort_dir,
         sort_field => sort_field,
         sort_fields => SORT_FIELDS,
+        pagination => pagination,
     })?;
 
     Ok(Html(rendered))

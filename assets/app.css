@@ -1,0 +1,21 @@
+.photos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1200px;
+}
+
+.photos > * {
+  display: block;
+}
+
+.photos > * img {
+  max-height: 300px;
+}
+
+.pagination {
+  display: flex;
+  list-style-type: none;
+  gap: 10px;
+}

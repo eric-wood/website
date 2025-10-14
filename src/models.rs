@@ -8,6 +8,8 @@ pub struct Photo {
     pub id: String,
     pub caption: String,
     pub filename: String,
+    pub width: u32,
+    pub height: u32,
     #[sqlx(try_from = "String")]
     pub taken_at: DateTime,
     #[sqlx(try_from = "String")]
