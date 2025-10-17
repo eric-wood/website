@@ -1,12 +1,24 @@
+use std::convert;
+
 use crate::{Photo, Tag};
 use serde::{Deserialize, Serialize};
 use sqlx::{QueryBuilder, Sqlite, SqlitePool, query::QueryAs};
 
-#[derive(Deserialize, Serialize, Clone, Copy)]
+#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SortDirection {
     Asc,
     Desc,
+}
+
+impl convert::From<SortDirection> for String {
+    fn from(value: SortDirection) -> String {
+        match value {
+            SortDirection::Asc => "asc",
+            SortDirection::Desc => "desc",
+        }
+        .to_string()
+    }
 }
 
 impl SortDirection {
@@ -19,20 +31,26 @@ impl SortDirection {
     }
 }
 
-#[derive(Deserialize, Serialize, Clone, Copy)]
+#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum SortField {
     TakenAt,
     CreatedAt,
 }
 
-impl SortField {
-    pub fn to_sql(self) -> String {
-        match self {
-            Self::TakenAt => "taken_at",
-            Self::CreatedAt => "created_at",
+impl convert::From<SortField> for String {
+    fn from(value: SortField) -> String {
+        match value {
+            SortField::TakenAt => "taken_at",
+            SortField::CreatedAt => "created_at",
         }
         .to_string()
+    }
+}
+
+impl SortField {
+    pub fn to_sql(self) -> String {
+        self.into()
     }
 }
 

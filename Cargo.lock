@@ -1070,6 +1070,7 @@ dependencies = [
  "dotenv",
  "minijinja",
  "serde",
+ "serde_urlencoded",
  "sqlx",
  "tokio",
  "tower-http",

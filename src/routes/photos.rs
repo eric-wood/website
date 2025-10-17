@@ -16,26 +16,27 @@ use crate::{
 pub struct Pagination {
     page: u32,
     num_pages: u32,
+    prev_query: Option<String>,
+    next_query: Option<String>,
 }
 
-#[derive(Deserialize)]
-#[serde(default)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct IndexParams {
-    page: u32,
-    limit: u32,
+    page: Option<u32>,
+    limit: Option<u32>,
     tag: Option<String>,
-    sort: SortField,
-    dir: SortDirection,
+    sort: Option<SortField>,
+    dir: Option<SortDirection>,
 }
 
 impl Default for IndexParams {
     fn default() -> Self {
         Self {
-            page: 1,
-            limit: 10,
+            page: Some(1),
+            limit: Some(10),
             tag: None,
-            sort: SortField::TakenAt,
-            dir: SortDirection::Desc,
+            sort: Some(SortField::TakenAt),
+            dir: Some(SortDirection::Desc),
         }
     }
 }
@@ -46,41 +47,41 @@ pub async fn index(
     query: Query<IndexParams>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Html<String>, AppError> {
+    let query = query.0;
+    let page = query.page.unwrap_or(1);
+    let limit = query.limit.unwrap_or(10);
+    let tag = query.tag.clone();
+    let sort = query.sort.unwrap_or(SortField::TakenAt);
+    let dir = query.dir.unwrap_or(SortDirection::Desc);
     let photos = db::get_photos(
         &state.pool,
         PhotoQuery {
             sort: Sort {
-                field: query.sort,
-                direction: query.dir,
+                field: sort,
+                direction: dir,
             },
-            pagination: QueryPagination {
-                limit: query.limit,
-                page: query.page,
-            },
-            tag: query.tag.to_owned(),
+            pagination: QueryPagination { limit, page },
+            tag: tag.to_owned(),
         },
     )
     .await?;
 
     let total_photos = db::get_photo_count(&state.pool).await?;
 
-    let current_tag = query.tag.clone();
+    let current_tag = tag.clone();
     let mut tags = db::get_tags(&state.pool).await?;
-    if let Some(tag) = &query.tag {
-        tags.retain(|t| t.name != *tag);
+    if let Some(tag) = tag {
+        tags.retain(|t| t.name != tag);
     }
 
     let sort_dir = query.dir;
     let sort_field = query.sort;
     let template = state.template_env.get_template("photos/index")?;
-    let pagination = Pagination {
-        page: query.page,
-        num_pages: total_photos / query.limit,
-    };
+    let num_pages = total_photos / limit;
+    let pagination = get_pagination(query, num_pages)?;
     let rendered = template.render(context! {
         photos => photos,
         tags => tags,
-        current_tag => current_tag,
         current_tag => current_tag,
         sort_dir => sort_dir,
         sort_field => sort_field,
@@ -102,4 +103,40 @@ pub async fn show(
     })?;
 
     Ok(Html(rendered))
+}
+
+fn get_pagination(query: IndexParams, num_pages: u32) -> anyhow::Result<Pagination> {
+    let page = query.page.unwrap_or(1);
+    let prev_query = if page > 1 {
+        let prev_page = if page == 1 { None } else { Some(page - 1) };
+        Some(serde_urlencoded::to_string(IndexParams {
+            page: prev_page,
+            tag: query.tag.clone(),
+            ..query
+        })?)
+    } else {
+        None
+    };
+
+    let next_query = if page < num_pages {
+        let next_page = if page < num_pages {
+            Some(page + 1)
+        } else {
+            None
+        };
+        Some(serde_urlencoded::to_string(IndexParams {
+            page: next_page,
+            tag: query.tag.clone(),
+            ..query
+        })?)
+    } else {
+        None
+    };
+
+    Ok(Pagination {
+        page,
+        num_pages,
+        prev_query,
+        next_query,
+    })
 }
