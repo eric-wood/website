@@ -16,7 +16,7 @@ pub struct Photo {
     pub created_at: DateTime,
 }
 
-#[derive(FromRow, Serialize)]
+#[derive(FromRow, Serialize, Clone)]
 pub struct Tag {
     pub name: String,
     pub count: u32,

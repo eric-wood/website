@@ -75,18 +75,18 @@ pub struct Pagination {
 pub struct PhotoQuery {
     pub sort: Sort,
     pub pagination: Pagination,
-    pub tag: Option<String>,
+    pub tags: Vec<String>,
 }
 
 pub async fn get_photos(pool: &SqlitePool, pq: PhotoQuery) -> anyhow::Result<(u32, Vec<Photo>)> {
-    let photos = build_photo_query(&pq, false)
+    let photos = build_photo_query(&pq)
         .build_query_as()
         .fetch_all(pool)
         .await?;
 
     // I like how convenient `QueryAs` is but it doesn't make it easy for me to select a COUNT for
     // the results on top of it so whatever! One more query!!
-    let (count,): (u32,) = build_photo_query(&pq, true)
+    let (count,): (u32,) = build_photo_count_query(&pq)
         .build_query_as()
         .fetch_one(pool)
         .await?;
@@ -94,33 +94,52 @@ pub async fn get_photos(pool: &SqlitePool, pq: PhotoQuery) -> anyhow::Result<(u3
     Ok((count, photos))
 }
 
-fn build_photo_query(pq: &PhotoQuery, count: bool) -> QueryBuilder<Sqlite> {
+fn build_photo_query(pq: &PhotoQuery) -> QueryBuilder<Sqlite> {
     let offset = pq.pagination.limit * (pq.pagination.page - 1);
 
-    let select = if count {
-        "SELECT COUNT(*) FROM photos "
-    } else {
-        "SELECT * FROM photos "
-    };
-    let mut query = QueryBuilder::new(select);
+    let mut query = QueryBuilder::new("SELECT photos.* FROM photos");
 
-    if let Some(tag) = pq.tag.clone() {
+    if !pq.tags.is_empty() {
+        query.push(", photo_tags WHERE photo_tags.tag IN (");
+        let mut separated = query.separated(", ");
+        for tag in pq.tags.iter().cloned() {
+            separated.push_bind(tag);
+        }
+        separated.push_unseparated(")");
         query
-            .push("JOIN photo_tags ON photo_tags.tag = ")
-            .push_bind(tag)
-            .push(" AND photo_tags.photo_id = photos.id ");
+            .push(" AND photo_tags.photo_id = photos.id")
+            .push(" GROUP BY photos.id HAVING COUNT(photo_tags.photo_id)=")
+            .push_bind(pq.tags.len() as u32);
     };
 
-    if !count {
-        let sort_sql = pq.sort.to_sql();
-        query.push(format!("ORDER BY {sort_sql}"));
+    let sort_sql = pq.sort.to_sql();
+    query.push(format!(" ORDER BY {sort_sql}"));
 
-        query
-            .push(" LIMIT ")
-            .push_bind(pq.pagination.limit)
-            .push(" OFFSET ")
-            .push_bind(offset);
+    query
+        .push(" LIMIT ")
+        .push_bind(pq.pagination.limit)
+        .push(" OFFSET ")
+        .push_bind(offset);
+
+    query
+}
+
+fn build_photo_count_query(pq: &PhotoQuery) -> QueryBuilder<Sqlite> {
+    if pq.tags.is_empty() {
+        return QueryBuilder::new("SELECT COUNT(*) FROM photos");
     }
+
+    let mut query =
+        QueryBuilder::new("SELECT COUNT(*) FROM (SELECT 1 FROM photo_tags WHERE tag IN (");
+    let mut separated = query.separated(", ");
+    for tag in pq.tags.iter().cloned() {
+        separated.push_bind(tag);
+    }
+    separated.push_unseparated(")");
+    query
+        .push(" GROUP BY photo_id HAVING COUNT(photo_id)=")
+        .push_bind(pq.tags.len() as u32)
+        .push(")");
 
     query
 }

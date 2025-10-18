@@ -4,18 +4,14 @@
   <nav>
   {{ dir }}
     <ul>
-    {% if current_tag %}
-      <li>{{ current_tag }} <a href="/">🅇</a></li>
-    {% endif %}
+    {%  for tag in current_tags %}
+      <li>{{ tag.tag }} <a href="/?{{ tag.action }}">🅇</a></li>
+    {% endfor %}
     {% for tag in tags %}
       <li>
-        {% if current_tag == tag.name -%}
-          {{ tag.name }} ({{ tag.count }})
-        {% else -%}
-          <a href="?tag={{ tag.name }}">
-            {{ tag.name }} ({{ tag.count }})
-          </a>
-        {% endif %}
+        <a href="?{{ tag.action }}">
+          {{ tag.tag.name }} ({{ tag.tag.count }})
+        </a>
       </li>
     {% endfor %}
     </ul>
