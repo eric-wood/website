@@ -2,7 +2,7 @@ use std::convert;
 
 use crate::{Photo, Tag};
 use serde::{Deserialize, Serialize};
-use sqlx::{QueryBuilder, Sqlite, SqlitePool, query::QueryAs};
+use sqlx::{QueryBuilder, Sqlite, SqlitePool};
 
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
@@ -78,38 +78,51 @@ pub struct PhotoQuery {
     pub tag: Option<String>,
 }
 
-pub async fn get_photo_count(pool: &SqlitePool) -> anyhow::Result<u32> {
-    let result: (u32,) = sqlx::query_as("SELECT COUNT(*) FROM photos")
+pub async fn get_photos(pool: &SqlitePool, pq: PhotoQuery) -> anyhow::Result<(u32, Vec<Photo>)> {
+    let photos = build_photo_query(&pq, false)
+        .build_query_as()
+        .fetch_all(pool)
+        .await?;
+
+    // I like how convenient `QueryAs` is but it doesn't make it easy for me to select a COUNT for
+    // the results on top of it so whatever! One more query!!
+    let (count,): (u32,) = build_photo_query(&pq, true)
+        .build_query_as()
         .fetch_one(pool)
         .await?;
-    Ok(result.0)
+
+    Ok((count, photos))
 }
 
-pub async fn get_photos(pool: &SqlitePool, pq: PhotoQuery) -> anyhow::Result<Vec<Photo>> {
+fn build_photo_query(pq: &PhotoQuery, count: bool) -> QueryBuilder<Sqlite> {
     let offset = pq.pagination.limit * (pq.pagination.page - 1);
 
-    let mut query: QueryBuilder<Sqlite> = QueryBuilder::new("SELECT * FROM photos ");
+    let select = if count {
+        "SELECT COUNT(*) FROM photos "
+    } else {
+        "SELECT * FROM photos "
+    };
+    let mut query = QueryBuilder::new(select);
 
-    if let Some(tag) = pq.tag {
+    if let Some(tag) = pq.tag.clone() {
         query
             .push("JOIN photo_tags ON photo_tags.tag = ")
             .push_bind(tag)
             .push(" AND photo_tags.photo_id = photos.id ");
     };
 
-    let sort_sql = pq.sort.to_sql();
-    query.push(format!("ORDER BY {sort_sql}"));
+    if !count {
+        let sort_sql = pq.sort.to_sql();
+        query.push(format!("ORDER BY {sort_sql}"));
+
+        query
+            .push(" LIMIT ")
+            .push_bind(pq.pagination.limit)
+            .push(" OFFSET ")
+            .push_bind(offset);
+    }
 
     query
-        .push(" LIMIT ")
-        .push_bind(pq.pagination.limit)
-        .push(" OFFSET ")
-        .push_bind(offset);
-
-    let query: QueryAs<'_, Sqlite, Photo, _> = query.build_query_as();
-    let photos = query.fetch_all(pool).await?;
-
-    Ok(photos)
 }
 
 pub async fn get_photo(pool: &SqlitePool, id: String) -> anyhow::Result<Photo> {

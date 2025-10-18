@@ -53,7 +53,7 @@ pub async fn index(
     let tag = query.tag.clone();
     let sort = query.sort.unwrap_or(SortField::TakenAt);
     let dir = query.dir.unwrap_or(SortDirection::Desc);
-    let photos = db::get_photos(
+    let (total_photos, photos) = db::get_photos(
         &state.pool,
         PhotoQuery {
             sort: Sort {
@@ -65,8 +65,6 @@ pub async fn index(
         },
     )
     .await?;
-
-    let total_photos = db::get_photo_count(&state.pool).await?;
 
     let current_tag = tag.clone();
     let mut tags = db::get_tags(&state.pool).await?;

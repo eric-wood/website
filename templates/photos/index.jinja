@@ -46,13 +46,15 @@
     {% endfor %}
   </div>
 
-  <ul class="pagination">
-    {% if pagination.prev_query %}
-      <a href="?{{ pagination.prev_query }}">←</a>
-    {% endif %}
-    <li>{{ pagination.page }} / {{ pagination.num_pages }}</li>
-    {% if pagination.next_query %}
-      <a href="?{{ pagination.next_query }}">→</a>
-    {% endif %}
-  </ul>
+  {% if pagination.num_pages > 1 %}
+    <ul class="pagination">
+      {% if pagination.prev_query %}
+        <a href="?{{ pagination.prev_query }}">←</a>
+      {% endif %}
+      <li>{{ pagination.page }} / {{ pagination.num_pages }}</li>
+      {% if pagination.next_query %}
+        <a href="?{{ pagination.next_query }}">→</a>
+      {% endif %}
+    </ul>
+  {% endif %}
 {% endblock %}
