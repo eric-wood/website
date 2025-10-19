@@ -1,0 +1,17 @@
+when:
+  - event: ["push", "pull_request"]
+    branch: ["main"]
+
+engine: nixery
+
+dependencies:
+  nixpkgs:
+    - rustup
+
+steps:
+  - name: build
+    command: |
+      cargo build
+  - name: clippy
+    command: |
+      cargo clippy
