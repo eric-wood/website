@@ -5,12 +5,12 @@
   {{ dir }}
     <ul>
     {%  for tag in current_tags %}
-      <li>{{ tag.tag }} <a href="/?{{ tag.action }}">🅇</a></li>
+      <li>{{ tag.name }} <a href="/?{{ tag.action }}">🅇</a></li>
     {% endfor %}
-    {% for tag in tags %}
+    {% for selectable in tags %}
       <li>
-        <a href="?{{ tag.action }}">
-          {{ tag.tag.name }} ({{ tag.tag.count }})
+        <a href="?{{ selectable.action }}">
+          {{ selectable.tag.name }} ({{ selectable.tag.count }})
         </a>
       </li>
     {% endfor %}

@@ -1,9 +1,6 @@
 use std::{collections::HashSet, sync::Arc};
 
-use axum::{
-    extract::{Path, State},
-    response::Html,
-};
+use axum::{extract::State, response::Html};
 use axum_extra::extract::Query;
 use minijinja::context;
 use serde::{self, Deserialize, Serialize};
@@ -24,7 +21,7 @@ struct Pagination {
 
 #[derive(Serialize)]
 struct SelectedTag {
-    tag: String,
+    name: String,
     action: String,
 }
 
@@ -105,17 +102,60 @@ pub async fn index(
     Ok(Html(rendered))
 }
 
-pub async fn show(
-    Path(id): Path<String>,
-    State(state): State<Arc<AppState>>,
-) -> Result<Html<String>, AppError> {
-    let photo = db::get_photo(&state.pool, id).await?;
-    let template = state.template_env.get_template("photos/show")?;
-    let rendered = template.render(context! {
-        photo => photo
-    })?;
+fn process_tags(
+    all_tags: &[Tag],
+    query: &IndexParams,
+) -> anyhow::Result<(Vec<SelectedTag>, Vec<SelectableTag>)> {
+    let selected = query.tags.clone().unwrap_or_default();
+    let tags = tag_difference(all_tags, &selected);
+    let selected_tags: Vec<SelectedTag> = selected
+        .iter()
+        .enumerate()
+        .map(|(i, tag)| {
+            let tags_removed = selected
+                .iter()
+                .enumerate()
+                .filter_map(|(j, s)| if i == j { None } else { Some(s.clone()) })
+                .collect();
+            let action = serde_html_form::to_string(IndexParams {
+                tags: Some(tags_removed),
+                ..*query
+            })?;
 
-    Ok(Html(rendered))
+            Ok(SelectedTag {
+                name: tag.clone(),
+                action,
+            })
+        })
+        .collect::<anyhow::Result<Vec<SelectedTag>>>()?;
+
+    let selectable_tags: Vec<SelectableTag> = tags
+        .iter()
+        .map(|tag| {
+            let mut tags_added = selected.clone();
+            tags_added.push(tag.name.clone());
+            let action = serde_html_form::to_string(IndexParams {
+                tags: Some(tags_added),
+                ..*query
+            })?;
+
+            Ok(SelectableTag {
+                tag: tag.clone(),
+                action,
+            })
+        })
+        .collect::<anyhow::Result<Vec<SelectableTag>>>()?;
+
+    Ok((selected_tags, selectable_tags))
+}
+
+fn tag_difference(tags: &[Tag], selected: &[String]) -> Vec<Tag> {
+    let selected: HashSet<&String> = HashSet::from_iter(selected.iter());
+
+    tags.iter()
+        .filter(|tag| !selected.contains(&tag.name))
+        .cloned()
+        .collect()
 }
 
 fn get_pagination(query: &IndexParams, num_pages: u32) -> anyhow::Result<Pagination> {
@@ -152,55 +192,4 @@ fn get_pagination(query: &IndexParams, num_pages: u32) -> anyhow::Result<Paginat
         prev_query,
         next_query,
     })
-}
-
-fn process_tags(
-    all_tags: &[Tag],
-    query: &IndexParams,
-) -> anyhow::Result<(Vec<SelectedTag>, Vec<SelectableTag>)> {
-    let selected = query.tags.clone().unwrap_or_default();
-    let tags = tag_difference(all_tags, &selected);
-    let selected_tags: Vec<SelectedTag> = selected
-        .iter()
-        .map(|tag| {
-            let tags_removed = selected.iter().filter(|i| *i != tag).cloned().collect();
-            let action = serde_html_form::to_string(IndexParams {
-                tags: Some(tags_removed),
-                ..*query
-            })?;
-
-            Ok(SelectedTag {
-                tag: tag.clone(),
-                action,
-            })
-        })
-        .collect::<anyhow::Result<Vec<SelectedTag>>>()?;
-
-    let selectable_tags: Vec<SelectableTag> = tags
-        .iter()
-        .map(|tag| {
-            let mut tags_added = selected.clone();
-            tags_added.push(tag.name.clone());
-            let action = serde_html_form::to_string(IndexParams {
-                tags: Some(tags_added),
-                ..*query
-            })?;
-
-            Ok(SelectableTag {
-                tag: tag.clone(),
-                action,
-            })
-        })
-        .collect::<anyhow::Result<Vec<SelectableTag>>>()?;
-
-    Ok((selected_tags, selectable_tags))
-}
-
-fn tag_difference(tags: &[Tag], selected: &[String]) -> Vec<Tag> {
-    let selected: HashSet<String> = HashSet::from_iter(selected.iter().cloned());
-
-    tags.iter()
-        .filter(|tag| !selected.contains(&tag.name))
-        .cloned()
-        .collect()
 }
