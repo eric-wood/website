@@ -1,55 +1,53 @@
 {% extends "layout" %}
 {% block title %}Photos{% endblock %}
+{% block head %}<link rel="stylesheet" href="/assets/photos/index.css" />{% endblock %}
 {% block body %}
-  <nav>
-  {{ dir }}
-    <ul>
-    {%  for tag in current_tags %}
-      <li>{{ tag.name }} <a href="/?{{ tag.action }}">🅇</a></li>
-    {% endfor %}
-    {% for selectable in tags %}
-      <li>
-        <a href="?{{ selectable.action }}">
-          {{ selectable.tag.name }} ({{ selectable.tag.count }})
-        </a>
-      </li>
-    {% endfor %}
-    </ul>
-    <p>
-      Sort: 
-      {% if sort_dir == "asc" -%}
-        <a href="/?dir=desc">↑</a>
-      {% else -%}
-        <a href="/?dir=asc">↓</a>
+  <div class="photos__layout">
+    <div>
+      <div class="photos">
+        {% for photo in photos %}
+          <a href="/{{ photo.id }}">
+            <img style="aspect-ratio: {{ photo.width }} / {{ photo.height }}"
+                 src="/thumbnails/{{ photo.id }}.webp">
+          </a>
+        {% endfor %}
+      </div>
+      {% if pagination.num_pages > 1 %}
+        <ul class="pagination">
+          {% if pagination.prev_query %}<a href="?{{ pagination.prev_query }}">←</a>{% endif %}
+          <li>{{ pagination.page }} / {{ pagination.num_pages }}</li>
+          {% if pagination.next_query %}<a href="?{{ pagination.next_query }}">→</a>{% endif %}
+        </ul>
       {% endif %}
-    </p>
-    <select id="sort" name="sort">
-      {% for field in sort_fields %}
-        <option value="{{ field }}" {% if field == sort_field -%}selected="true"{% endif %}>{{ field }}</option>
-      {% endfor %}
-    </select>
+    </div>
+    <nav class="photos__nav">
+      <ul>
+        {% for tag in current_tags %}
+          <li>
+            {{ tag.name }} <a href="/?{{ tag.action }}">🅇</a>
+          </li>
+        {% endfor %}
+        {% for selectable in tags %}
+          <li>
+            <a href="?{{ selectable.action }}">{{ selectable.tag.name }} ({{ selectable.tag.count }})</a>
+          </li>
+        {% endfor %}
+      </ul>
+      <p>
+        Sort:
+        {% if sort_dir == "asc" -%}
+          <a href="/?dir=desc">↑</a>
+        {% else -%}
+          <a href="/?dir=asc">↓</a>
+        {% endif %}
+      </p>
+      <select id="sort" name="sort">
+        {% for field in sort_fields %}
+          <option value="{{ field }}"
+                  {% if field == sort_field -%}selected="true"{% endif %}>{{ field }}</option>
+        {% endfor %}
+      </select>
     </select>
   </nav>
-  <div class="photos">
-    {% for photo in photos %}
-      <a href="/{{ photo.id }}">
-        <img
-          style="aspect-ratio: {{ photo.width }} / {{ photo.height }}"
-          src="/thumbnails/{{ photo.id }}.webp"
-        >
-      </a>
-    {% endfor %}
-  </div>
-
-  {% if pagination.num_pages > 1 %}
-    <ul class="pagination">
-      {% if pagination.prev_query %}
-        <a href="?{{ pagination.prev_query }}">←</a>
-      {% endif %}
-      <li>{{ pagination.page }} / {{ pagination.num_pages }}</li>
-      {% if pagination.next_query %}
-        <a href="?{{ pagination.next_query }}">→</a>
-      {% endif %}
-    </ul>
-  {% endif %}
+</div>
 {% endblock %}

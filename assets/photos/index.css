@@ -1,0 +1,40 @@
+.photos__layout {
+  display: flex;
+}
+
+.photos__nav {
+  padding: 20px;
+  width: 20%;
+}
+
+.photos__nav a {
+  text-decoration: none;
+}
+
+.photos__nav ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.photos {
+  display: flex;
+  flex-wrap: wrap;
+  /*justify-content: center;*/
+  gap: 20px;
+  max-width: 1200px;
+  flex-shrink: 1;
+}
+
+.photos > * {
+  display: block;
+}
+
+.photos > * img {
+  max-height: 300px;
+}
+
+.pagination {
+  display: flex;
+  list-style-type: none;
+  gap: 10px;
+}

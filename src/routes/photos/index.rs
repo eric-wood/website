@@ -119,6 +119,7 @@ fn process_tags(
                 .collect();
             let action = serde_html_form::to_string(IndexParams {
                 tags: Some(tags_removed),
+                page: None,
                 ..*query
             })?;
 
@@ -136,6 +137,7 @@ fn process_tags(
             tags_added.push(tag.name.clone());
             let action = serde_html_form::to_string(IndexParams {
                 tags: Some(tags_added),
+                page: None,
                 ..*query
             })?;
 

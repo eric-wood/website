@@ -7,15 +7,24 @@
     {% else %}
       <li>ISO {{ photo.iso }} {{ focal_length }}mm ƒ{{ aperture }} {{ shutter_speed }}</li>
     {% endif %}
-    <li>Camera: {{ photo.camera }}
-    <li>Taken: <time datetime="{{ photo.taken_at }}">{{ photo.taken_at }}</time></li>
-    <li>Added: <time datetime="{{ photo.created_at }}">{{ photo.created_at }}</time></li>
-  </ul>
-  <p>
-    Tags:
-    {% for tag in tags %}
-      <a href="/?tags={{ tag.name }}">{{ tag.name }}</a>
-    {% endfor %}
-  </p>
-  <img src="/images/{{ photo.filename }}" style="max-width: 1200px;">
-{% endblock %}
+    <li>
+      Camera: {{ photo.camera }}
+      <li>
+        {% if photo.film %}
+          Scanned
+        {% else %}
+          Taken
+        {% endif %}
+        :
+        <time datetime="{{ photo.taken_at }}">{{ photo.taken_at }}</time>
+      </li>
+      <li>
+        Added: <time datetime="{{ photo.created_at }}">{{ photo.created_at }}</time>
+      </li>
+    </ul>
+    <p>
+      Tags:
+      {% for tag in tags %}<a href="/?tags={{ tag.name }}">{{ tag.name }}</a>{% endfor %}
+    </p>
+    <img src="/images/{{ photo.filename }}" style="max-width: 1200px;">
+  {% endblock %}
