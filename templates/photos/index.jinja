@@ -33,7 +33,6 @@
   <div class="photos">
     {% for photo in photos %}
       <a href="/{{ photo.id }}">
-        <p><time datetime="{{ photo.taken_at }}">{{ photo.taken_at }}</time></p>
         <img
           style="aspect-ratio: {{ photo.width }} / {{ photo.height }}"
           src="/thumbnails/{{ photo.id }}.webp"

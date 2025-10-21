@@ -90,13 +90,13 @@ pub async fn index(
 
     let template = state.template_env.get_template("photos/index")?;
     let rendered = template.render(context! {
-        photos => photos,
-        tags => tags,
-        current_tags => current_tags,
-        sort_dir => sort_dir,
-        sort_field => sort_field,
+        photos,
+        tags,
+        current_tags,
+        sort_dir,
+        sort_field,
+        pagination,
         sort_fields => SORT_FIELDS,
-        pagination => pagination,
     })?;
 
     Ok(Html(rendered))

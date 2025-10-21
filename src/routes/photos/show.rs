@@ -10,10 +10,18 @@ pub async fn show(
     Path(id): Path<String>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Html<String>, AppError> {
-    let photo = db::get_photo(&state.pool, id).await?;
+    let photo = db::get_photo(&state.pool, &id).await?;
+    let tags = db::get_photo_tags(&state.pool, &id).await?;
     let template = state.template_env.get_template("photos/show")?;
+    let aperture = format!("{:.1}", photo.aperture);
+    let focal_length = format!("{:.0}", photo.focal_length);
+    let shutter_speed = format!("1/{:.0}s", 1.0 / photo.shutter_speed);
     let rendered = template.render(context! {
-        photo => photo
+        aperture,
+        focal_length,
+        shutter_speed,
+        photo,
+        tags,
     })?;
 
     Ok(Html(rendered))

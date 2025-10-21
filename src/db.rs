@@ -144,7 +144,7 @@ fn build_photo_count_query(pq: &PhotoQuery) -> QueryBuilder<Sqlite> {
     query
 }
 
-pub async fn get_photo(pool: &SqlitePool, id: String) -> anyhow::Result<Photo> {
+pub async fn get_photo(pool: &SqlitePool, id: &String) -> anyhow::Result<Photo> {
     let photo: Photo = sqlx::query_as("SELECT * FROM photos WHERE id = ?")
         .bind(id)
         .fetch_one(pool)
@@ -157,6 +157,23 @@ pub async fn get_tags(pool: &SqlitePool) -> anyhow::Result<Vec<Tag>> {
     let tags: Vec<Tag> = sqlx::query_as("SELECT * FROM tags ORDER BY count DESC")
         .fetch_all(pool)
         .await?;
+
+    Ok(tags)
+}
+
+pub async fn get_photo_tags(pool: &SqlitePool, photo_id: &String) -> anyhow::Result<Vec<Tag>> {
+    let tags: Vec<Tag> = sqlx::query_as(
+        r#"
+        SELECT tags.*
+        FROM tags
+        JOIN photo_tags
+        WHERE photo_tags.tag = tags.name AND photo_id = ?
+        ORDER BY count DESC
+        "#,
+    )
+    .bind(photo_id)
+    .fetch_all(pool)
+    .await?;
 
     Ok(tags)
 }
