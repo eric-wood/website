@@ -153,10 +153,50 @@ pub async fn get_photo(pool: &SqlitePool, id: &String) -> anyhow::Result<Photo> 
     Ok(photo)
 }
 
-pub async fn get_tags(pool: &SqlitePool) -> anyhow::Result<Vec<Tag>> {
-    let tags: Vec<Tag> = sqlx::query_as("SELECT * FROM tags ORDER BY count DESC")
-        .fetch_all(pool)
-        .await?;
+pub async fn get_tags(
+    pool: &SqlitePool,
+    selected_tags: &Option<Vec<String>>,
+) -> anyhow::Result<Vec<Tag>> {
+    let tags = if let Some(selected_tags) = selected_tags {
+        let mut query = QueryBuilder::new(
+            r#"
+        WITH filtered_photos AS (
+            SELECT photos.id FROM photos, photo_tags
+            WHERE photo_tags.tag IN ("#,
+        );
+        let mut separated = query.separated(", ");
+        for tag in selected_tags.iter().clone() {
+            separated.push_bind(tag);
+        }
+        separated.push_unseparated(") ");
+        query
+            .push(
+                r#"
+            AND photo_tags.photo_id = photos.id
+            GROUP BY photos.id
+            HAVING COUNT(photo_tags.photo_id)="#,
+            )
+            .push_bind(selected_tags.len() as u32)
+            .push(
+                r#"
+            )
+            SELECT DISTINCT photo_tags.tag, COUNT(photo_tags.tag) FROM photo_tags
+            JOIN filtered_photos ON filtered_photos.id = photo_tags.photo_id
+            GROUP BY photo_tags.tag
+            ORDER BY count(photo_tags.tag) DESC
+            "#,
+            );
+        let results: Vec<(String, u32)> = query.build_query_as().fetch_all(pool).await?;
+        results
+            .into_iter()
+            .map(|(name, count)| Tag { name, count })
+            .collect()
+    } else {
+        let tags: Vec<Tag> = sqlx::query_as("SELECT * FROM tags ORDER BY count DESC")
+            .fetch_all(pool)
+            .await?;
+        tags
+    };
 
     Ok(tags)
 }

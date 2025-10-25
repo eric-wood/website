@@ -85,7 +85,7 @@ pub async fn index(
     let num_pages = (total_photos as f32 / limit as f32).ceil() as u32;
     let pagination = get_pagination(&query, num_pages)?;
 
-    let all_tags = db::get_tags(&state.pool).await?;
+    let all_tags = db::get_tags(&state.pool, &query.tags).await?;
     let (current_tags, tags) = process_tags(&all_tags, &query)?;
 
     let template = state.template_env.get_template("photos/index")?;
