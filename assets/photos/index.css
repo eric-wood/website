@@ -5,15 +5,28 @@
 .photos__nav {
   padding: 20px;
   width: 20%;
+  font-family: Inter, sans-serif;
 }
 
 .photos__nav a {
   text-decoration: none;
+  color: black;
+}
+
+.photos__nav a:visited {
+  color: black;
 }
 
 .photos__nav ul {
   list-style-type: none;
   padding: 0;
+}
+
+.photos__nav li.selected {
+  display: inline-block;
+  padding: 0px 7px;
+  border-radius: 5px;
+  background-color: #e4e4e4;
 }
 
 .photos {
@@ -38,3 +51,4 @@
   list-style-type: none;
   gap: 10px;
 }
+
