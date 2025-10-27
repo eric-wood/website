@@ -9,6 +9,7 @@ use crate::{
     AppError, AppState,
     db::{self, Pagination as QueryPagination, PhotoQuery, Sort, SortDirection, SortField},
     models::Tag,
+    templates::render,
 };
 
 #[derive(Serialize)]
@@ -88,16 +89,19 @@ pub async fn index(
     let all_tags = db::get_tags(&state.pool, &query.tags).await?;
     let (current_tags, tags) = process_tags(&all_tags, &query)?;
 
-    let template = state.template_env.get_template("photos/index")?;
-    let rendered = template.render(context! {
-        photos,
-        tags,
-        current_tags,
-        sort_dir,
-        sort_field,
-        pagination,
-        sort_fields => SORT_FIELDS,
-    })?;
+    let rendered = render(
+        &state.reloader,
+        "photos/index",
+        context! {
+            photos,
+            tags,
+            current_tags,
+            sort_dir,
+            sort_field,
+            pagination,
+            sort_fields => SORT_FIELDS,
+        },
+    )?;
 
     Ok(Html(rendered))
 }

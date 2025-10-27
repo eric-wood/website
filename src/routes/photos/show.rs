@@ -1,4 +1,4 @@
-use crate::{AppError, AppState, db};
+use crate::{AppError, AppState, db, templates::render};
 use axum::{
     extract::{Path, State},
     response::Html,
@@ -12,17 +12,21 @@ pub async fn show(
 ) -> Result<Html<String>, AppError> {
     let photo = db::get_photo(&state.pool, &id).await?;
     let tags = db::get_photo_tags(&state.pool, &id).await?;
-    let template = state.template_env.get_template("photos/show")?;
     let aperture = format!("{:.1}", photo.aperture);
     let focal_length = format!("{:.0}", photo.focal_length);
     let shutter_speed = format!("1/{:.0}s", 1.0 / photo.shutter_speed);
-    let rendered = template.render(context! {
-        aperture,
-        focal_length,
-        shutter_speed,
-        photo,
-        tags,
-    })?;
+
+    let rendered = render(
+        &state.reloader,
+        "photos/show",
+        context! {
+            aperture,
+            focal_length,
+            shutter_speed,
+            photo,
+            tags,
+        },
+    )?;
 
     Ok(Html(rendered))
 }

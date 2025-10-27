@@ -5,11 +5,12 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.100"
-axum = "0.8.6"
+axum = { version = "0.8.6", features = ["macros"] }
 axum-extra = { version = "0.10.3", features = ["query"] }
 chrono = "0.4.42"
 dotenv = "0.15.0"
 minijinja = { version = "2.12.0", features = ["loader"] }
+minijinja-autoreload = "2.12.0"
 serde = "1.0.228"
 serde_html_form = "0.2.8"
 sqlx = { version = "0.8.6", features = ["runtime-tokio", "sqlite"] }

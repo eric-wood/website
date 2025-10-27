@@ -1,50 +1,44 @@
-use anyhow::Context;
-use minijinja::Environment;
-use std::{
-    fs::{self, DirEntry, read_to_string},
-    path::Path,
-};
+use minijinja::{Environment, Error, ErrorKind};
+use minijinja_autoreload::AutoReloader;
+use serde::Serialize;
+use std::{env, fs::read_to_string, path::Path};
 
-pub fn load_templates<'a>() -> anyhow::Result<Environment<'a>> {
-    let mut env = Environment::new();
+pub fn load_templates_dyn() -> AutoReloader {
+    AutoReloader::new(move |notifier| {
+        let mut env = Environment::new();
+        env.set_loader(loader);
 
-    let path = Path::new("templates");
-    visit_dirs(path, &mut |entry: &DirEntry| -> anyhow::Result<()> {
-        let path = entry.path();
-        let file_name = path.file_stem().unwrap().to_str().unwrap().to_owned();
-        let parent = path.parent().unwrap();
-        let prefix = parent.strip_prefix("templates")?.to_str().unwrap();
-        let name = if prefix.is_empty() {
-            file_name
-        } else {
-            format!("{prefix}/{file_name}")
-        };
+        notifier.set_fast_reload(true);
 
-        let template_str = read_to_string(entry.path())
-            .with_context(|| format!("read template file: {:?}", entry.path()))?;
-        env.add_template_owned(name, template_str)
-            .context("add_template_owned")?;
-
-        Ok(())
-    })?;
-
-    Ok(env)
+        let should_autoreload = env::var("AUTO_RELOAD_TEMPLATES").is_ok_and(|c| c == "true");
+        if should_autoreload {
+            let template_path = Path::new("templates");
+            notifier.watch_path(template_path, true);
+        }
+        Ok(env)
+    })
 }
 
-fn visit_dirs(
-    dir: &Path,
-    cb: &mut dyn FnMut(&DirEntry) -> anyhow::Result<()>,
-) -> anyhow::Result<()> {
-    if dir.is_dir() {
-        for entry in fs::read_dir(dir)? {
-            let entry = entry?;
-            let path = entry.path();
-            if path.is_dir() {
-                visit_dirs(&path, cb)?;
-            } else {
-                cb(&entry).context("visit_dirs callback")?;
-            }
-        }
-    }
-    Ok(())
+fn loader(name: &str) -> Result<Option<String>, Error> {
+    let root_path = Path::new("templates");
+    let template_path = root_path.join(format!("{name}.jinja"));
+    let template = read_to_string(&template_path).map_err(|_| {
+        Error::new(
+            ErrorKind::TemplateNotFound,
+            format!(
+                "Unable to locate {name} at {}",
+                template_path.to_owned().to_str().unwrap()
+            ),
+        )
+    })?;
+    Ok(Some(template))
+}
+
+pub fn render<S>(reloader: &AutoReloader, name: &str, context: S) -> anyhow::Result<String>
+where
+    S: Serialize,
+{
+    let template_env = reloader.acquire_env()?;
+    let template = template_env.get_template(name)?;
+    Ok(template.render(context)?)
 }

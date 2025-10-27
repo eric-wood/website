@@ -1,6 +1,6 @@
 use axum::{Router, routing::get};
 use dotenv::dotenv;
-use minijinja::Environment;
+use minijinja_autoreload::AutoReloader;
 use std::{env, sync::Arc};
 mod app_error;
 use app_error::AppError;
@@ -11,11 +11,11 @@ mod routes;
 mod templates;
 use models::{Photo, Tag};
 use sqlx::SqlitePool;
-use templates::load_templates;
+use templates::load_templates_dyn;
 use tower_http::services::ServeDir;
 
 struct AppState {
-    template_env: Environment<'static>,
+    reloader: AutoReloader,
     pool: SqlitePool,
 }
 
@@ -26,8 +26,8 @@ async fn main() -> anyhow::Result<()> {
         .await
         .expect("Where's the database???");
 
-    let template_env = load_templates()?;
-    let app_state = Arc::new(AppState { template_env, pool });
+    let reloader = load_templates_dyn();
+    let app_state = Arc::new(AppState { reloader, pool });
     let app = Router::new()
         .route("/", get(routes::photos::index))
         .route("/{id}", get(routes::photos::show))
