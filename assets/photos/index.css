@@ -3,6 +3,10 @@
   padding-left: 30px;
 }
 
+.photos__container {
+  flex-grow: 1;
+}
+
 .photos {
   display: flex;
   flex-wrap: wrap;
@@ -19,13 +23,25 @@
 
 .pagination {
   display: flex;
-  list-style-type: none;
+  justify-content: space-between;
+  align-items: center;
   gap: 10px;
+  list-style-type: none;
+  margin: 30px 0;
+  padding: 0;
+  font-size: 14pt;
+  font-family: "Inter";
+}
+
+.pagination a {
+  text-decoration: none;
+  color: black;
+  font-size: 22pt;
 }
 
 
 .photos__nav {
-  padding: 20px;
+  padding: 0 20px;
   min-width: 300px;
   max-width: 300px;
   font-family: Inter, sans-serif;
@@ -46,6 +62,7 @@
   gap: 5px;
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
 .photos__nav li {

@@ -17,11 +17,19 @@
         {% endfor %}
       </div>
       {% if pagination.num_pages > 1 %}
-        <ul class="pagination">
-          {% if pagination.prev_query %}<a href="?{{ pagination.prev_query }}">←</a>{% endif %}
-          <li>{{ pagination.page }} / {{ pagination.num_pages }}</li>
-          {% if pagination.next_query %}<a href="?{{ pagination.next_query }}">→</a>{% endif %}
-        </ul>
+        <nav class="pagination">
+          {% if pagination.prev_query %}
+            <a href="?{{ pagination.prev_query }}">←</a>
+          {% else %}
+            <span></span>
+          {% endif %}
+          <span><b>{{ pagination.page }}</b> / {{ pagination.num_pages }}</span>
+          {% if pagination.next_query %}
+            <a href="?{{ pagination.next_query }}">→</a>
+          {% else %}
+            <span></span>
+          {% endif %}
+        </nav>
       {% endif %}
     </div>
     <nav class="photos__nav">
@@ -50,12 +58,6 @@
           <a href="/?dir=asc">↓</a>
         {% endif %}
       </p>
-      <select id="sort" name="sort">
-        {% for field in sort_fields %}
-          <option value="{{ field }}"
-                  {% if field == sort_field -%}selected="true"{% endif %}>{{ field }}</option>
-        {% endfor %}
-      </select>
     </select>
   </nav>
 </div>
