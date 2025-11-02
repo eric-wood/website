@@ -82,6 +82,7 @@ pub async fn index(
 
     let sort_dir = query.dir;
     let sort_field = query.sort;
+    let sort_link = sort_link(&query, dir)?;
 
     let num_pages = (total_photos as f32 / limit as f32).ceil() as u32;
     let pagination = get_pagination(&query, num_pages)?;
@@ -100,6 +101,7 @@ pub async fn index(
             sort_field,
             pagination,
             sort_fields => SORT_FIELDS,
+            sort_link,
         },
     )?;
 
@@ -198,4 +200,17 @@ fn get_pagination(query: &IndexParams, num_pages: u32) -> anyhow::Result<Paginat
         prev_query,
         next_query,
     })
+}
+
+fn sort_link(query: &IndexParams, dir: SortDirection) -> anyhow::Result<String> {
+    let new_dir = match dir {
+        SortDirection::Asc => SortDirection::Desc,
+        SortDirection::Desc => SortDirection::Asc,
+    };
+
+    Ok(serde_html_form::to_string(IndexParams {
+        dir: Some(new_dir),
+        tags: query.tags.clone(),
+        ..*query
+    })?)
 }

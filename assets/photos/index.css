@@ -15,6 +15,11 @@
 
 .photos > * {
   max-height: 500px;
+  transition: transform 0.3s;
+}
+
+.photos > *:hover {
+  transform: scale(1.01);
 }
 
 .photos > * img {
@@ -33,12 +38,30 @@
   font-family: "Inter";
 }
 
-.pagination a {
+.pagination .arrow {
   text-decoration: none;
   color: black;
   font-size: 22pt;
 }
 
+.pagination span.arrow {
+  visibility: hidden;
+}
+
+.pagination .page {
+  position: relative;
+  font-weight: bold;
+}
+
+.pagination .page select {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  cursor: pointer;
+}
 
 .photos__nav {
   padding: 0 20px;

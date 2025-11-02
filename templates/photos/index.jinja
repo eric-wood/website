@@ -19,15 +19,33 @@
       {% if pagination.num_pages > 1 %}
         <nav class="pagination">
           {% if pagination.prev_query %}
-            <a href="?{{ pagination.prev_query }}">←</a>
+            <a href="?{{ pagination.prev_query }}" class="arrow">←</a>
           {% else %}
-            <span></span>
+            <span class="arrow">←</span>
           {% endif %}
-          <span><b>{{ pagination.page }}</b> / {{ pagination.num_pages }}</span>
+          <span>
+            <span class="page">
+              <label for="page_number">{{ pagination.page }}</label>
+              <select id="page_number">
+                {% for i in range(pagination.num_pages) %}
+                  <option
+                    value="{{ i + 1 }}"
+                    {% if pagination.page == i + 1 %}
+                      selected="selected"
+                    {% endif %}
+                  >
+                    {{ i + 1 }}
+                  </option>
+                {% endfor %}
+              </select>
+            </span>
+            /
+            {{ pagination.num_pages }}
+          </span>
           {% if pagination.next_query %}
-            <a href="?{{ pagination.next_query }}">→</a>
+            <a href="?{{ pagination.next_query }}" class="arrow">→</a>
           {% else %}
-            <span></span>
+            <span class="arrow">→</span>
           {% endif %}
         </nav>
       {% endif %}
@@ -52,11 +70,9 @@
       </ul>
       <p>
         Sort:
-        {% if sort_dir == "asc" -%}
-          <a href="/?dir=desc">↑</a>
-        {% else -%}
-          <a href="/?dir=asc">↓</a>
-        {% endif %}
+          <a href="/?{{ sort_link }}">
+            {% if sort_dir == "asc" -%}↑{% else -%}↓{% endif %}
+          </a>
       </p>
     </select>
   </nav>

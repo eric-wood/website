@@ -63,3 +63,11 @@ window.addEventListener("resize", () => {
   windowWidth = window.innerWidth;
   recalculateHeights();
 });
+
+const pageNumberSelect = document.getElementById("page_number")
+pageNumberSelect.addEventListener("change", (event) => {
+  const page = event.currentTarget.value;
+  const url = new URL(window.location);
+  url.searchParams.set("page", page);
+  window.location = url.toString();
+});
