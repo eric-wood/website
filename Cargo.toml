@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.100"
 axum = { version = "0.8.6", features = ["macros"] }
-axum-extra = { version = "0.10.3", features = ["query"] }
+axum-extra = { version = "0.12.1", features = ["query"] }
 chrono = "0.4.42"
 dotenv = "0.15.0"
 minijinja = { version = "2.12.0", features = ["loader"] }
@@ -16,3 +16,4 @@ serde_html_form = "0.2.8"
 sqlx = { version = "0.8.6", features = ["runtime-tokio", "sqlite"] }
 tokio = { version = "1.47.1", features = ["rt-multi-thread"] }
 tower-http = { version = "0.6.6", features = ["fs"] }
+urlencoding = "2.1.3"

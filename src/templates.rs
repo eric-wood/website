@@ -15,6 +15,7 @@ pub fn load_templates_dyn() -> AutoReloader {
             let template_path = Path::new("templates");
             notifier.watch_path(template_path, true);
         }
+        env.add_function("url_escape", url_escape);
         Ok(env)
     })
 }
@@ -41,4 +42,8 @@ where
     let template_env = reloader.acquire_env()?;
     let template = template_env.get_template(name)?;
     Ok(template.render(context)?)
+}
+
+fn url_escape(input: String) -> String {
+    urlencoding::encode(&input).into_owned()
 }
