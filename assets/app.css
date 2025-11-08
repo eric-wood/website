@@ -13,17 +13,19 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-family: "Inter", sans-serif;
 }
 
 .container {
   width: 100%;
   max-width: 3000px;
   overflow: auto;
+  padding: 0 30px;
 }
 
 header {
   width: 100%;
-  padding: 30px;
+  padding: 30px 0;
 }
 
 h1 {

@@ -1,30 +1,64 @@
 {% extends "layout" %}
 {% block title %}Photos / View{% endblock %}
+{% block head %}<link rel="stylesheet" href="/assets/photos/show.css" />{% endblock %}
 {% block body %}
-  <ul>
-    {% if photo.film %}
-      <li>Film: {{ photo.film }} {{ photo.iso }}</li>
-    {% else %}
-      <li>ISO {{ photo.iso }} {{ focal_length }}mm ƒ{{ aperture }} {{ shutter_speed }}</li>
-    {% endif %}
-    <li>
-      Camera: {{ photo.camera }}
-      <li>
+  <div class="photo__container">
+    <div class="photo__image">
+      <img src="/images/{{ photo.filename }}">
+    </div>
+    <div class="photo__sidebar">
+      <h2>Metadata</h2>
+      <ul class="photo__metadata">
         {% if photo.film %}
-          Scanned
+          <li>
+            <span>Film</span>
+            <span>{{ photo.film }} {{ photo.iso }}</span>
+          </li>
         {% else %}
-          Taken
+          <li>
+            <span>ISO</span>
+            <span>{{ photo.iso }}</span>
+          </li>
+          <li>
+            <span>Focal Length</span>
+            <span>{{ focal_length }}mm</span>
+          </li>
+          <li>
+            <span>Aperture</span>
+            <span>f{{ aperture }}</span>
+          </li>
+          <li>
+            <span>Shutter Speed</span>
+            <span>{{ shutter_speed }}</span>
+          </li>
         {% endif %}
-        :
-        <time datetime="{{ photo.taken_at }}">{{ photo.taken_at }}</time>
-      </li>
-      <li>
-        Added: <time datetime="{{ photo.created_at }}">{{ photo.created_at }}</time>
-      </li>
-    </ul>
-    <p>
-      Tags:
-      {% for tag in tags %}<a href="/?tags={{ tag.name }}">{{ tag.name }}</a>{% endfor %}
-    </p>
-    <img src="/images/{{ photo.filename }}" style="max-width: 1200px;">
+        <li>
+          <span>Camera</span>
+          <span>{{ photo.camera }}</span>
+        </li>
+        <li>
+          <span>
+            {% if photo.film %}
+              Scanned
+            {% else %}
+              Taken
+            {% endif %}
+          </span>
+          <time datetime="{{ photo.taken_at }}">{{ photo.taken_at }}</time>
+        </li>
+        <li>
+          <span>Added</span>
+          <time datetime="{{ photo.created_at }}">{{ photo.created_at }}</time>
+        </li>
+      </ul>
+      <div class="photo__tags">
+        <ul>
+          {% for tag in tags %}
+            <li class="photo__tag">
+              <a href="/?tags={{ tag.name }}">{{ tag.name }}</a>
+            </li>
+          {% endfor %}
+      </p>
+    </div>
+  </div>
   {% endblock %}

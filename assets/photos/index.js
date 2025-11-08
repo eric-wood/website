@@ -52,7 +52,9 @@ const recalculateHeights = () => {
   });
 };
 
-recalculateHeights();
+window.addEventListener("load", () => {
+  recalculateHeights();
+});
 
 let windowWidth = window.innerWidth;
 window.addEventListener("resize", () => {
