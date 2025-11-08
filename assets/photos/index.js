@@ -13,11 +13,10 @@ const photos = Array.from(document.querySelectorAll(".photos > *")).map(
 
 const MAX_HEIGHT = parseFloat(getComputedStyle(photos[0].element).maxHeight.replace('px', ''))
 const container = document.querySelector(".photos");
+const gap = parseFloat(getComputedStyle(container).gap.replace('px', ''));
 
 const recalculateHeights = () => {
   const containerWidth = container.getBoundingClientRect().width - 1;
-  const gap = parseFloat(getComputedStyle(container).gap.replace('px', ''));
-
   const newRow = () => ({
     photos: [],
     aspectRatio: 0,
@@ -45,26 +44,27 @@ const recalculateHeights = () => {
   })
 
   grid.forEach(({ aspectRatio, photos }) => {
-    photos.forEach(({ element }) => {
-      const height = rowWidth(photos) / aspectRatio;
-      element.style.height = `${height}px`;
+    photos.forEach((photo) => {
+      const { element, aspectRatio: photoAspectRatio } = photo;
+      photo.height = rowWidth(photos) / aspectRatio;
+      photo.width = photoAspectRatio * photo.height;
     });
+  });
+
+  photos.forEach(({ element, width, height }) => {
+    element.style.height = `${height}px`;
+    element.style.maxWidth = `${width}px`;
+    element.style.opacity = 100;
   });
 };
 
-window.addEventListener("load", () => {
-  recalculateHeights();
-});
-
-let windowWidth = window.innerWidth;
-window.addEventListener("resize", () => {
-  if (window.innerWidth === windowWidth) {
-    return;
+const resizeObserver = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    recalculateHeights();
   }
-
-  windowWidth = window.innerWidth;
-  recalculateHeights();
 });
+
+resizeObserver.observe(document.body);
 
 const pageNumberSelect = document.getElementById("page_number")
 pageNumberSelect.addEventListener("change", (event) => {

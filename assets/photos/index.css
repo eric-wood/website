@@ -15,7 +15,9 @@
 
 .photos > * {
   max-height: 500px;
+  overflow: hidden;
   transition: transform 0.3s;
+  opacity: 0;
 }
 
 .photos > *:hover {
@@ -23,6 +25,7 @@
 }
 
 .photos > * img {
+  object-fit: cover;
   max-height: 100%;
 }
 
@@ -64,6 +67,7 @@
 
 .photos__nav {
   flex-basis: max-content;
+  min-width: 200px;
 }
 
 .photos__nav a {
