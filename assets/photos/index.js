@@ -54,7 +54,7 @@ const recalculateHeights = () => {
   photos.forEach(({ element, width, height }) => {
     element.style.height = `${height}px`;
     element.style.maxWidth = `${width}px`;
-    element.style.opacity = 100;
+    element.style.display = 'initial';
   });
 };
 
@@ -72,4 +72,10 @@ pageNumberSelect.addEventListener("change", (event) => {
   const url = new URL(window.location);
   url.searchParams.set("page", page);
   window.location = url.toString();
+});
+
+document.querySelectorAll(".mobile-nav-toggle").forEach((el) => {
+  el.addEventListener("click", () => {
+    document.querySelector(".photos__nav").classList.toggle("open");
+  });
 });
