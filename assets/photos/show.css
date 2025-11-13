@@ -10,12 +10,12 @@
 
 .photo__image img {
   max-width: 100%;
-  max-height: 90vh;
+  max-height: 85vh;
 }
 
 .photo__sidebar {
   flex-basis: max-content;
-  max-width: 350px;
+  /*max-width: 350px;*/
 }
 
 .photo__sidebar h2 {
@@ -45,10 +45,15 @@
   border-bottom: solid black 1px;
 }
 
+  
 .photo__metadata li > *:first-child {
   font-size: 10pt;
   text-transform: uppercase;
   font-weight: bold;
+}
+
+.photo__metadata li > *:last-child {
+  text-wrap: nowrap;
 }
 
 .photo__tags {
@@ -81,4 +86,20 @@
   background-color: #e4e4e4;
   color: black;
   text-decoration: none;
+}
+
+@media (max-width: 1024px) {
+  .photo__container {
+    flex-direction: column;
+  }
+
+  .photo__sidebar {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 500px) {
+  .photo__sidebar {
+    width: 100%;
+  }
 }

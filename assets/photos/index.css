@@ -65,16 +65,13 @@
   cursor: pointer;
 }
 
-.mobile-only {
-  display: none;
-}
-
 .photos__nav {
   flex-basis: max-content;
   min-width: 200px;
 }
 
 .photos__nav .close {
+  display: none;
   position: fixed;
   top: 30px;
   right: 30px;
@@ -133,7 +130,7 @@
 }
 
 .photos__mobile-nav {
-  display: flex;
+  display: none;
   justify-content: space-between;
   align-items: center;
 }
@@ -169,12 +166,12 @@
     background: white;
   }
 
-  .photos__nav.open {
+  .photos__nav .close {
     display: block;
   }
 
-  .mobile-only {
-    display: initial;
+  .photos__nav.open {
+    display: block;
   }
 
   .photos__mobile-nav {

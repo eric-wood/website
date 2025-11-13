@@ -3,7 +3,7 @@
 {% block head %}<link rel="stylesheet" href="/assets/photos/index.css" />{% endblock %}
 {% block body %}
   <div class="photos__layout">
-    <div class="photos__mobile-nav mobile-only">
+    <div class="photos__mobile-nav">
       <button type="button" class="mobile-nav-toggle">Filter</button>
       <a href="/?{{ sort_link }}" class="sort">
         Sort {% if sort_dir == "asc" -%}↑{% else -%}↓{% endif %}
@@ -80,7 +80,7 @@
             {% if sort_dir == "asc" -%}↑{% else -%}↓{% endif %}
           </a>
       </p>
-      <button type="button" class="close mobile-only mobile-nav-toggle">
+      <button type="button" class="close mobile-nav-toggle">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <use xlink:href="#close-icon" />
         </svg>

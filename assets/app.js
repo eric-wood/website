@@ -7,7 +7,7 @@ const initTimestamps = () => {
 
     const date = new Date(timeStr.value);
     const formatted = new Intl.DateTimeFormat(undefined, {
-      month: "long",
+      month: "short",
       day: "numeric",
       year: "numeric"
     }).format(date);
