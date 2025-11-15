@@ -1136,6 +1136,7 @@ dependencies = [
  "serde",
  "serde_html_form",
  "sqlx",
+ "thiserror",
  "tokio",
  "tower-http",
  "urlencoding",

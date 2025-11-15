@@ -78,7 +78,10 @@ pub struct PhotoQuery {
     pub tags: Vec<String>,
 }
 
-pub async fn get_photos(pool: &SqlitePool, pq: PhotoQuery) -> anyhow::Result<(u32, Vec<Photo>)> {
+pub async fn get_photos(
+    pool: &SqlitePool,
+    pq: PhotoQuery,
+) -> Result<(u32, Vec<Photo>), sqlx::Error> {
     let photos = build_photo_query(&pq)
         .build_query_as()
         .fetch_all(pool)
@@ -144,7 +147,7 @@ fn build_photo_count_query(pq: &PhotoQuery) -> QueryBuilder<Sqlite> {
     query
 }
 
-pub async fn get_photo(pool: &SqlitePool, id: &String) -> anyhow::Result<Photo> {
+pub async fn get_photo(pool: &SqlitePool, id: &String) -> Result<Photo, sqlx::Error> {
     let photo: Photo = sqlx::query_as("SELECT * FROM photos WHERE id = ?")
         .bind(id)
         .fetch_one(pool)

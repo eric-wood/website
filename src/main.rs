@@ -1,4 +1,4 @@
-use axum::{Router, routing::get};
+use axum::{Router, response::Html, routing::get};
 use dotenv::dotenv;
 use minijinja_autoreload::AutoReloader;
 use std::{env, sync::Arc};
@@ -29,14 +29,19 @@ async fn main() -> anyhow::Result<()> {
     let reloader = load_templates_dyn();
     let app_state = Arc::new(AppState { reloader, pool });
     let app = Router::new()
-        .route("/", get(routes::photos::index))
-        .route("/{id}", get(routes::photos::show))
+        .route("/photos", get(routes::photos::index))
+        .route("/photos/{id}", get(routes::photos::show))
         .with_state(app_state)
         .nest_service("/assets", ServeDir::new(&env::var("ASSETS_PATH")?))
         .nest_service("/thumbnails", ServeDir::new(&env::var("THUMBNAIL_PATH")?))
-        .nest_service("/images", ServeDir::new(&env::var("IMAGE_PATH")?));
+        .nest_service("/images", ServeDir::new(&env::var("IMAGE_PATH")?))
+        .fallback(handler_404);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await?;
 
     Ok(())
+}
+
+async fn handler_404() -> anyhow::Result<Html<String>, app_error::AppError> {
+    Err(AppError::NotFound)
 }
