@@ -5,7 +5,7 @@
   <div class="photos__layout">
     <div class="photos__mobile-nav">
       <button type="button" class="mobile-nav-toggle">Filter</button>
-      <a href="/?{{ sort_link }}" class="sort">
+      <a href="?{{ sort_link }}" class="sort">
         Sort {% if sort_dir == "asc" -%}↑{% else -%}↓{% endif %}
       </a>
     </div>
@@ -13,7 +13,7 @@
       <div class="photos">
         {% for photo in photos %}
           <a
-            href="/{{ photo.id }}"
+            href="/photos/{{ photo.id }}"
             id="{{ photo.id }}"
             data-width="{{ photo.width }}"
             data-height="{{ photo.height }}"
@@ -76,7 +76,7 @@
       </ul>
       <p>
         Sort:
-          <a href="/?{{ sort_link }}">
+          <a href="?{{ sort_link }}">
             {% if sort_dir == "asc" -%}↑{% else -%}↓{% endif %}
           </a>
       </p>

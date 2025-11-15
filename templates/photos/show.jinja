@@ -55,7 +55,7 @@
         <ul>
           {% for tag in tags %}
             <li class="photo__tag">
-              <a href="/?tags={{ url_escape(tag.name) }}">{{ tag.name }}</a>
+              <a href="/photos?tags={{ url_escape(tag.name) }}">{{ tag.name }}</a>
             </li>
           {% endfor %}
       </p>
