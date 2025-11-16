@@ -4,6 +4,7 @@ use axum::{extract::State, response::Html};
 use axum_extra::extract::Query;
 use minijinja::context;
 use serde::{self, Deserialize, Serialize};
+use serde_valid::Validate;
 
 use crate::{
     AppError, AppState,
@@ -32,10 +33,15 @@ struct SelectableTag {
     action: String,
 }
 
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Validate)]
 pub struct IndexParams {
+    #[validate(minimum = 1)]
     page: Option<u32>,
+
+    #[validate(minimum = 1)]
+    #[validate(maximum = 100)]
     limit: Option<u32>,
+
     tags: Option<Vec<String>>,
     sort: Option<SortField>,
     dir: Option<SortDirection>,
@@ -59,6 +65,7 @@ pub async fn index(
     query: Query<IndexParams>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Html<String>, AppError> {
+    query.validate()?;
     let query = query.0;
     let default = IndexParams::default();
     let page = query.page.unwrap_or(default.page.unwrap());
