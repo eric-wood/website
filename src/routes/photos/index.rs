@@ -51,7 +51,7 @@ impl Default for IndexParams {
     fn default() -> Self {
         Self {
             page: Some(1),
-            limit: Some(10),
+            limit: Some(30),
             tags: Some(vec![]),
             sort: Some(SortField::TakenAt),
             dir: Some(SortDirection::Desc),

@@ -3,6 +3,13 @@ use minijinja_autoreload::AutoReloader;
 use serde::Serialize;
 use std::{env, fs::read_to_string, path::Path};
 
+#[derive(Serialize)]
+struct NavLink<'a> {
+    id: &'a str,
+    label: &'a str,
+    href: &'a str,
+}
+
 pub fn load_templates_dyn() -> AutoReloader {
     AutoReloader::new(move |notifier| {
         let mut env = Environment::new();
@@ -16,6 +23,14 @@ pub fn load_templates_dyn() -> AutoReloader {
             notifier.watch_path(template_path, true);
         }
         env.add_function("url_escape", url_escape);
+        //env.add_global(
+        //    "nav_links",
+        //    [NavLink {
+        //        id: "photos",
+        //        label: "Photos",
+        //        href: "/photos",
+        //    }],
+        //);
         Ok(env)
     })
 }

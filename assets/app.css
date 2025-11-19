@@ -20,18 +20,35 @@ body {
   width: 100%;
   max-width: 3000px;
   overflow: auto;
-  padding: 0 30px;
 }
 
 header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  font-size: 16pt;
   width: 100%;
-  padding: 30px 0;
+  border-bottom: solid black 3px;
 }
 
-h1 {
-  font-family: "Inter";
+header h1 {
   text-transform: uppercase;
   font-weight: 900;
   margin: 0;
   letter-spacing: 3px;
+  padding: 10px 30px;
+  border-right: solid black 3px;
+}
+
+header nav ul {
+  display: flex;
+  gap: 30px;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+header nav ul a {
+  text-decoration: none;
+  color: black;
 }

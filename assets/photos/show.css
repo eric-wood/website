@@ -1,7 +1,8 @@
 .photo__container {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   width: 100%;
+  padding: 30px;
 }
 
 .photo__image {
@@ -98,8 +99,13 @@
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
+  .photo__container {
+    padding: 30px 0;
+  }
+
   .photo__sidebar {
     width: 100%;
+    padding: 0 20px;
   }
 }
