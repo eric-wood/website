@@ -29,12 +29,15 @@ async fn main() -> anyhow::Result<()> {
     let reloader = load_templates_dyn();
     let app_state = Arc::new(AppState { reloader, pool });
     let app = Router::new()
+        .nest_service("/photos/assets", ServeDir::new(&env::var("ASSETS_PATH")?))
+        .nest_service(
+            "/photos/thumbnails",
+            ServeDir::new(&env::var("THUMBNAIL_PATH")?),
+        )
+        .nest_service("/photos/images", ServeDir::new(&env::var("IMAGE_PATH")?))
         .route("/photos", get(routes::photos::index))
         .route("/photos/{id}", get(routes::photos::show))
         .with_state(app_state)
-        .nest_service("/assets", ServeDir::new(&env::var("ASSETS_PATH")?))
-        .nest_service("/thumbnails", ServeDir::new(&env::var("THUMBNAIL_PATH")?))
-        .nest_service("/images", ServeDir::new(&env::var("IMAGE_PATH")?))
         .fallback(handler_404);
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await?;

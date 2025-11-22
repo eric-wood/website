@@ -1,10 +1,10 @@
 {% extends "layout" %}
 {% block title %}Photos / View{% endblock %}
-{% block head %}<link rel="stylesheet" href="/assets/photos/show.css" />{% endblock %}
+{% block head %}<link rel="stylesheet" href="/photos/assets/photos/show.css" />{% endblock %}
 {% block body %}
   <div class="photo__container">
     <div class="photo__image">
-      <img src="/images/{{ photo.filename }}">
+      <img src="/photos/images/{{ photo.filename }}">
     </div>
     <div class="photo__sidebar">
       <h2>Metadata</h2>
