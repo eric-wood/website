@@ -21,7 +21,7 @@ struct AppState {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    dotenv().ok();
+    dotenv()?;
     let pool = SqlitePool::connect(&env::var("DATABASE_URL")?)
         .await
         .expect("Where's the database???");
