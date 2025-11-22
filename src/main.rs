@@ -1,5 +1,5 @@
 use axum::{Router, response::Html, routing::get};
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use minijinja_autoreload::AutoReloader;
 use std::{env, sync::Arc};
 mod app_error;

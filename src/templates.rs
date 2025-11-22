@@ -3,12 +3,12 @@ use minijinja_autoreload::AutoReloader;
 use serde::Serialize;
 use std::{env, fs::read_to_string, path::Path};
 
-#[derive(Serialize)]
-struct NavLink<'a> {
-    id: &'a str,
-    label: &'a str,
-    href: &'a str,
-}
+//#[derive(Serialize)]
+//struct NavLink<'a> {
+//    id: &'a str,
+//    label: &'a str,
+//    href: &'a str,
+//}
 
 pub fn load_templates_dyn() -> AutoReloader {
     AutoReloader::new(move |notifier| {
