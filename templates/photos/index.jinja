@@ -18,7 +18,12 @@
             data-width="{{ photo.width }}"
             data-height="{{ photo.height }}"
           >
-            <img src="/photos/thumbnails/{{ photo.id }}.webp">
+            <img
+            {% if loop.index < 6 %}
+              fetchpriority="high"
+            {% endif %}
+              src="/photos/thumbnails/{{ photo.id }}.webp"
+            >
           </a>
         {% endfor %}
       </div>

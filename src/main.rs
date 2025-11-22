@@ -1,7 +1,13 @@
-use axum::{Router, response::Html, routing::get};
+use axum::{
+    Router,
+    http::{HeaderValue, header},
+    response::Html,
+    routing::get,
+};
 use dotenvy::dotenv;
 use minijinja_autoreload::AutoReloader;
 use std::{env, sync::Arc};
+use tower::ServiceBuilder;
 mod app_error;
 use app_error::AppError;
 mod date_time;
@@ -12,7 +18,7 @@ mod templates;
 use models::{Photo, Tag};
 use sqlx::SqlitePool;
 use templates::load_templates_dyn;
-use tower_http::services::ServeDir;
+use tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer};
 
 struct AppState {
     reloader: AutoReloader,
@@ -29,12 +35,33 @@ async fn main() -> anyhow::Result<()> {
     let reloader = load_templates_dyn();
     let app_state = Arc::new(AppState { reloader, pool });
     let app = Router::new()
-        .nest_service("/photos/assets", ServeDir::new(&env::var("ASSETS_PATH")?))
+        .nest_service(
+            "/photos/assets",
+            ServiceBuilder::new()
+                .layer(SetResponseHeaderLayer::overriding(
+                    header::CACHE_CONTROL,
+                    HeaderValue::from_static("public, max-age=31536000, immutible"),
+                ))
+                .service(ServeDir::new(&env::var("ASSETS_PATH")?)),
+        )
         .nest_service(
             "/photos/thumbnails",
-            ServeDir::new(&env::var("THUMBNAIL_PATH")?),
+            ServiceBuilder::new()
+                .layer(SetResponseHeaderLayer::overriding(
+                    header::CACHE_CONTROL,
+                    HeaderValue::from_static("public, max-age=31536000, immutible"),
+                ))
+                .service(ServeDir::new(&env::var("THUMBNAIL_PATH")?)),
         )
-        .nest_service("/photos/images", ServeDir::new(&env::var("IMAGE_PATH")?))
+        .nest_service(
+            "/photos/images",
+            ServiceBuilder::new()
+                .layer(SetResponseHeaderLayer::overriding(
+                    header::CACHE_CONTROL,
+                    HeaderValue::from_static("public, max-age=31536000, immutible"),
+                ))
+                .service(ServeDir::new(&env::var("IMAGE_PATH")?)),
+        )
         .route("/photos", get(routes::photos::index))
         .route("/photos/{id}", get(routes::photos::show))
         .with_state(app_state)
