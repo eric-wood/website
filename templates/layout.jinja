@@ -36,8 +36,6 @@
 
       header {
         display: flex;
-        align-items: center;
-        gap: 30px;
         font-size: 16pt;
         width: 100%;
         border-bottom: solid black 3px;
@@ -54,15 +52,24 @@
 
       header nav ul {
         display: flex;
-        gap: 30px;
+        height: 100%;
         list-style-type: none;
         margin: 0;
         padding: 0;
       }
 
       header nav ul a {
+        display: flex;
+        align-items: center;
+        height: 100%;
         text-decoration: none;
         color: black;
+        padding: 0 30px;
+      }
+
+      header nav ul a.active, header nav ul a:hover {
+        background-color: black;
+        color: white;
       }
     </style>
     <title>
@@ -73,13 +80,22 @@
   <body>
     <div class="container">
       <header>
+      <div>
         <h1>Eric Wood</h1>
+        </div>
         <nav>
           <ul>
-            <li><a href="/photos">Photos</a></li>
-            <li><a href="">Music</a></li>
-            <li><a href="">Blog</a></li>
-            <li><a href="">Projects</a></li>
+            {% set active_page = active_page|default('') %}
+            {% for link in nav_links %}
+              <li>
+                <a
+                  href="{{ link.href }}"
+                  {% if active_page == link.id %}
+                  class="active"
+                  {% endif %}
+                >{{ link.label }}</a>
+              </li>
+            {% endfor %}
           </ul>
         </nav>
       </header>

@@ -1,14 +1,14 @@
-use minijinja::{Environment, Error, ErrorKind};
+use minijinja::{Environment, Error, ErrorKind, Value};
 use minijinja_autoreload::AutoReloader;
 use serde::Serialize;
 use std::{env, fs::read_to_string, path::Path};
 
-//#[derive(Serialize)]
-//struct NavLink<'a> {
-//    id: &'a str,
-//    label: &'a str,
-//    href: &'a str,
-//}
+#[derive(Serialize)]
+struct NavLink<'a> {
+    id: &'a str,
+    label: &'a str,
+    href: &'a str,
+}
 
 pub fn load_templates_dyn() -> AutoReloader {
     AutoReloader::new(move |notifier| {
@@ -23,14 +23,31 @@ pub fn load_templates_dyn() -> AutoReloader {
             notifier.watch_path(template_path, true);
         }
         env.add_function("url_escape", url_escape);
-        //env.add_global(
-        //    "nav_links",
-        //    [NavLink {
-        //        id: "photos",
-        //        label: "Photos",
-        //        href: "/photos",
-        //    }],
-        //);
+        env.add_global(
+            "nav_links",
+            Value::from_serialize([
+                NavLink {
+                    id: "photos",
+                    label: "Photos",
+                    href: "/photos",
+                },
+                NavLink {
+                    id: "music",
+                    label: "Music",
+                    href: "/music",
+                },
+                NavLink {
+                    id: "blog",
+                    label: "Blog",
+                    href: "/blog",
+                },
+                NavLink {
+                    id: "projects",
+                    label: "Projects",
+                    href: "/projects",
+                },
+            ]),
+        );
         Ok(env)
     })
 }

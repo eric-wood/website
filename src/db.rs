@@ -97,7 +97,7 @@ pub async fn get_photos(
     Ok((count, photos))
 }
 
-fn build_photo_query(pq: &PhotoQuery) -> QueryBuilder<Sqlite> {
+fn build_photo_query(pq: &PhotoQuery) -> QueryBuilder<'_, Sqlite> {
     let offset = pq.pagination.limit * (pq.pagination.page - 1);
 
     let mut query = QueryBuilder::new("SELECT photos.* FROM photos");
@@ -127,7 +127,7 @@ fn build_photo_query(pq: &PhotoQuery) -> QueryBuilder<Sqlite> {
     query
 }
 
-fn build_photo_count_query(pq: &PhotoQuery) -> QueryBuilder<Sqlite> {
+fn build_photo_count_query(pq: &PhotoQuery) -> QueryBuilder<'_, Sqlite> {
     if pq.tags.is_empty() {
         return QueryBuilder::new("SELECT COUNT(*) FROM photos");
     }
