@@ -155,6 +155,7 @@
 @media (max-width: 700px) {
   .photos__layout {
     flex-direction: column;
+    padding: 30px;
   }
 
   .photos__nav {
@@ -178,5 +179,14 @@
 
   .photos__mobile-nav {
     display: flex;
+  }
+
+  .photos > a {
+    max-height: initial;
+    width: 100%;
+  }
+
+  .photos > a img {
+    width: 100%;
   }
 }

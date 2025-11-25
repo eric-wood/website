@@ -71,6 +71,16 @@
         background-color: black;
         color: white;
       }
+
+      @media (max-width: 850px) {
+        header {
+          flex-direction: column;
+        }
+
+        header nav ul {
+          flex-direction: column;
+        }
+      }
     </style>
     <title>
       {% block title %}{% endblock %}
