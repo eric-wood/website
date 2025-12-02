@@ -7,8 +7,14 @@ edition = "2024"
 anyhow = "1.0.100"
 axum = { version = "0.8.6", features = ["macros"] }
 axum-extra = { version = "0.12.1", features = ["query"] }
+axum-tracing-opentelemetry = "0.32.2"
 chrono = "0.4.42"
 dotenvy = "0.15.7"
+init-tracing-opentelemetry = { version = "0.34.0", features = [
+  "otlp",
+  "tracing_subscriber_ext",
+  "metrics",
+] }
 minijinja = { version = "2.12.0", features = ["loader"] }
 minijinja-autoreload = "2.12.0"
 serde = "1.0.228"
@@ -19,4 +25,5 @@ thiserror = "2.0.17"
 tokio = { version = "1.47.1", features = ["rt-multi-thread"] }
 tower = "0.5.2"
 tower-http = { version = "0.6.6", features = ["fs", "set-header"] }
+tracing = "0.1.43"
 urlencoding = "2.1.3"

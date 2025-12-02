@@ -15,6 +15,8 @@ mod db;
 mod models;
 mod routes;
 mod templates;
+use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
+use init_tracing_opentelemetry::TracingConfig;
 use models::{Photo, Tag};
 use sqlx::SqlitePool;
 use templates::load_templates_dyn;
@@ -28,9 +30,20 @@ struct AppState {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let _ = dotenv();
+    let environment = env::var("ENVIRONMENT").unwrap_or("development".to_string());
+    let tracing_config = if environment == "production" {
+        TracingConfig::production()
+    } else {
+        TracingConfig::development()
+    };
+
+    let _guard = tracing_config.init_subscriber()?;
+
     let pool = SqlitePool::connect(&env::var("DATABASE_URL")?)
         .await
         .expect("Where's the database???");
+
+    tracing::info!("connected to DB");
 
     let reloader = load_templates_dyn();
     let app_state = Arc::new(AppState { reloader, pool });
@@ -65,7 +78,9 @@ async fn main() -> anyhow::Result<()> {
         .route("/photos", get(routes::photos::index))
         .route("/photos/{id}", get(routes::photos::show))
         .with_state(app_state)
-        .fallback(handler_404);
+        .fallback(handler_404)
+        .layer(OtelInResponseLayer)
+        .layer(OtelAxumLayer::default());
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await?;
 
