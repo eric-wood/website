@@ -1,3 +1,4 @@
+#![feature(string_replace_in_place)]
 use axum::{
     Router,
     http::{HeaderValue, header},
@@ -6,7 +7,7 @@ use axum::{
 };
 use dotenvy::dotenv;
 use minijinja_autoreload::AutoReloader;
-use std::{env, sync::Arc};
+use std::{collections::HashMap, env, path::PathBuf, sync::Arc};
 use tower::ServiceBuilder;
 mod app_error;
 use app_error::AppError;
@@ -16,6 +17,7 @@ mod models;
 mod routes;
 mod templates;
 use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
+mod blog;
 use init_tracing_opentelemetry::TracingConfig;
 use models::{Photo, Tag};
 use sqlx::SqlitePool;
@@ -24,8 +26,11 @@ use tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer};
 
 struct AppState {
     reloader: AutoReloader,
-    pool: SqlitePool,
+    photos_db_pool: SqlitePool,
+    blog_slugs: HashMap<String, PathBuf>,
 }
+
+type Response = Result<Html<String>, AppError>;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -39,14 +44,20 @@ async fn main() -> anyhow::Result<()> {
 
     let _guard = tracing_config.init_subscriber()?;
 
-    let pool = SqlitePool::connect(&env::var("DATABASE_URL")?)
+    let photos_db_pool = SqlitePool::connect(&env::var("DATABASE_URL")?)
         .await
         .expect("Where's the database???");
 
     tracing::info!("connected to DB");
 
+    let blog_slugs = blog::get_posts()?;
+
     let reloader = load_templates_dyn();
-    let app_state = Arc::new(AppState { reloader, pool });
+    let app_state = Arc::new(AppState {
+        reloader,
+        photos_db_pool,
+        blog_slugs,
+    });
     let app = Router::new()
         .nest_service(
             "/photos/assets",
@@ -77,6 +88,8 @@ async fn main() -> anyhow::Result<()> {
         )
         .route("/photos", get(routes::photos::index))
         .route("/photos/{id}", get(routes::photos::show))
+        .route("/blog", get(routes::blog::index))
+        .route("/blog/{slug}", get(routes::blog::show))
         .with_state(app_state)
         .fallback(handler_404)
         .layer(OtelInResponseLayer)

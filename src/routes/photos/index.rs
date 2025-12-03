@@ -7,7 +7,7 @@ use serde::{self, Deserialize, Serialize};
 use serde_valid::Validate;
 
 use crate::{
-    AppError, AppState,
+    AppState, Response,
     db::{self, Pagination as QueryPagination, PhotoQuery, Sort, SortDirection, SortField},
     models::Tag,
     templates::render,
@@ -61,10 +61,7 @@ impl Default for IndexParams {
 
 static SORT_FIELDS: [SortField; 2] = [SortField::TakenAt, SortField::CreatedAt];
 
-pub async fn index(
-    query: Query<IndexParams>,
-    State(state): State<Arc<AppState>>,
-) -> Result<Html<String>, AppError> {
+pub async fn index(query: Query<IndexParams>, State(state): State<Arc<AppState>>) -> Response {
     query.validate()?;
     let query = query.0;
     let default = IndexParams::default();
@@ -75,7 +72,7 @@ pub async fn index(
     let dir = query.dir.unwrap_or(default.dir.unwrap());
 
     let (total_photos, photos) = db::get_photos(
-        &state.pool,
+        &state.photos_db_pool,
         PhotoQuery {
             sort: Sort {
                 field: sort,
@@ -94,7 +91,7 @@ pub async fn index(
     let num_pages = (total_photos as f32 / limit as f32).ceil() as u32;
     let pagination = get_pagination(&query, num_pages)?;
 
-    let all_tags = db::get_tags(&state.pool, &query.tags).await?;
+    let all_tags = db::get_tags(&state.photos_db_pool, &query.tags).await?;
     let (current_tags, tags) = process_tags(&all_tags, &query)?;
 
     let rendered = render(
