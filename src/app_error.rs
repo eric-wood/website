@@ -16,6 +16,9 @@ pub enum AppError {
 
     #[error("internal server error")]
     Anyhow(#[from] anyhow::Error),
+
+    #[error("internal server error")]
+    IoError(#[from] std::io::Error),
 }
 
 impl AppError {
@@ -23,7 +26,9 @@ impl AppError {
         match self {
             Self::NotFound => StatusCode::NOT_FOUND,
             Self::ValidationError(_) => StatusCode::BAD_REQUEST,
-            Self::DbError(_) | Self::Anyhow(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::DbError(_) | Self::Anyhow(_) | Self::IoError(_) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
         }
     }
 }
