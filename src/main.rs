@@ -7,7 +7,7 @@ use axum::{
 };
 use dotenvy::dotenv;
 use minijinja_autoreload::AutoReloader;
-use std::{collections::HashMap, env, path::PathBuf, sync::Arc};
+use std::{collections::HashMap, env, sync::Arc};
 use tower::ServiceBuilder;
 mod app_error;
 use app_error::AppError;
@@ -24,10 +24,12 @@ use sqlx::SqlitePool;
 use templates::load_templates_dyn;
 use tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer};
 
+use crate::blog::BlogPost;
+
 struct AppState {
     reloader: AutoReloader,
     photos_db_pool: SqlitePool,
-    blog_slugs: HashMap<String, PathBuf>,
+    blog_slugs: HashMap<String, BlogPost>,
 }
 
 type Response = Result<Html<String>, AppError>;
