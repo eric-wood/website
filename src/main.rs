@@ -7,7 +7,7 @@ use axum::{
 };
 use dotenvy::dotenv;
 use minijinja_autoreload::AutoReloader;
-use std::{collections::HashMap, env, sync::Arc};
+use std::{collections::HashMap, fs, path::Path, sync::Arc};
 use tower::ServiceBuilder;
 mod app_error;
 use app_error::AppError;
@@ -23,10 +23,13 @@ use models::{Photo, Tag};
 use sqlx::SqlitePool;
 use templates::load_templates_dyn;
 use tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer};
+mod config;
+use config::Config;
 
 use crate::blog::BlogPost;
 
 struct AppState {
+    config: Config,
     reloader: AutoReloader,
     photos_db_pool: SqlitePool,
     blog_slugs: HashMap<String, BlogPost>,
@@ -34,11 +37,21 @@ struct AppState {
 
 type Response = Result<Html<String>, AppError>;
 
+pub fn bootstrap_cache(config: &Config) -> anyhow::Result<()> {
+    let cache_path = Path::new(&config.cache_path);
+    fs::create_dir_all(cache_path).expect("failed to create cache directory");
+    fs::create_dir_all(cache_path.join("blog"))?;
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let _ = dotenv();
-    let environment = env::var("ENVIRONMENT").unwrap_or("development".to_string());
-    let tracing_config = if environment == "production" {
+
+    let config = Config::new()?;
+    bootstrap_cache(&config)?;
+
+    let tracing_config = if config.is_prod() {
         TracingConfig::production()
     } else {
         TracingConfig::development()
@@ -46,20 +59,15 @@ async fn main() -> anyhow::Result<()> {
 
     let _guard = tracing_config.init_subscriber()?;
 
-    let photos_db_pool = SqlitePool::connect(&env::var("DATABASE_URL")?)
+    let photos_db_pool = SqlitePool::connect(&config.photos_db_path)
         .await
         .expect("Where's the database???");
 
     tracing::info!("connected to DB");
 
-    let blog_slugs = blog::get_posts()?;
+    let blog_slugs = blog::load_index(&config)?;
 
-    let reloader = load_templates_dyn();
-    let app_state = Arc::new(AppState {
-        reloader,
-        photos_db_pool,
-        blog_slugs,
-    });
+    let reloader = load_templates_dyn(config.auto_reload_templates);
     let app = Router::new()
         .nest_service(
             "/photos/assets",
@@ -68,7 +76,7 @@ async fn main() -> anyhow::Result<()> {
                     header::CACHE_CONTROL,
                     HeaderValue::from_static("public, max-age=31536000, immutible"),
                 ))
-                .service(ServeDir::new(&env::var("ASSETS_PATH")?)),
+                .service(ServeDir::new(&config.assets_path)),
         )
         .nest_service(
             "/photos/thumbnails",
@@ -77,7 +85,7 @@ async fn main() -> anyhow::Result<()> {
                     header::CACHE_CONTROL,
                     HeaderValue::from_static("public, max-age=31536000, immutible"),
                 ))
-                .service(ServeDir::new(&env::var("THUMBNAIL_PATH")?)),
+                .service(ServeDir::new(&config.photos_thumbnail_path)),
         )
         .nest_service(
             "/photos/images",
@@ -86,16 +94,28 @@ async fn main() -> anyhow::Result<()> {
                     header::CACHE_CONTROL,
                     HeaderValue::from_static("public, max-age=31536000, immutible"),
                 ))
-                .service(ServeDir::new(&env::var("IMAGE_PATH")?)),
+                .service(ServeDir::new(&config.photos_image_path)),
         )
         .route("/photos", get(routes::photos::index))
         .route("/photos/{id}", get(routes::photos::show))
         .route("/blog", get(routes::blog::index))
-        .route("/blog/{slug}", get(routes::blog::show))
+        .route("/blog/{slug}", get(routes::blog::show));
+
+    let app_state = Arc::new(AppState {
+        config,
+        reloader,
+        photos_db_pool,
+        blog_slugs,
+    });
+
+    blog::cache_posts(&app_state)?;
+
+    let app = app
         .with_state(app_state)
         .fallback(handler_404)
         .layer(OtelInResponseLayer)
         .layer(OtelAxumLayer::default());
+
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await?;
 

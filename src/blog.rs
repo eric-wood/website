@@ -1,26 +1,27 @@
 use std::{
     collections::HashMap,
-    env,
     fs::{self, File, read_to_string},
-    io::{BufRead, BufReader},
+    io::{BufRead, BufReader, Write},
     path::{Path, PathBuf},
 };
 
 use comrak::{markdown_to_html_with_plugins, options, plugins::syntect::SyntectAdapterBuilder};
+use minijinja::context;
 
-use crate::date_time::DateTime;
+use crate::{AppState, config::Config, date_time::DateTime, templates::render};
 
-#[derive(serde::Deserialize, serde::Serialize)]
+#[derive(serde::Deserialize, serde::Serialize, Clone)]
 pub struct BlogPost {
     pub title: Option<String>,
     pub published_at: Option<DateTime>,
     #[serde(skip_deserializing)]
     pub file_path: PathBuf,
+    #[serde(skip_deserializing)]
+    pub cache_path: PathBuf,
 }
 
-pub fn get_posts() -> anyhow::Result<HashMap<String, BlogPost>> {
-    let path_str = env::var("BLOG_POSTS_PATH").expect("BLOG_POSTS_PATH not set");
-    let root_path = Path::new(&path_str);
+pub fn load_index(config: &Config) -> anyhow::Result<HashMap<String, BlogPost>> {
+    let root_path = Path::new(&config.blog_posts_path);
     let mut map = HashMap::new();
 
     let names: Vec<String> = fs::read_dir(root_path)?
@@ -44,6 +45,7 @@ pub fn get_posts() -> anyhow::Result<HashMap<String, BlogPost>> {
 
         if let Some(mut post) = maybe_post {
             post.file_path = path;
+            post.cache_path = Path::new(&config.cache_path).join("blog").join(&slug);
             map.insert(slug, post);
         }
     }
@@ -111,4 +113,31 @@ pub fn render_post(path: &PathBuf) -> anyhow::Result<String> {
     );
 
     Ok(body)
+}
+
+// Render all of our blog posts as fully static HTML files so we can serve them up without having
+// to do all that extra markdown stuff. Maybe find a better way to share this logic with the
+// controller in the near future.
+pub fn cache_posts(state: &AppState) -> anyhow::Result<()> {
+    if !state.config.is_prod() {
+        return Ok(());
+    }
+
+    for post in state.blog_slugs.values() {
+        let body = render_post(&post.file_path)?;
+        let post = post.clone();
+        let rendered = render(
+            &state.reloader,
+            "blog/show",
+            context! {
+                post,
+                body,
+            },
+        )?;
+
+        let mut file = File::create(post.cache_path)?;
+        file.write_all(rendered.as_bytes())?;
+    }
+
+    Ok(())
 }

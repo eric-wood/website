@@ -1,7 +1,7 @@
 use minijinja::{Environment, Error, ErrorKind, Value};
 use minijinja_autoreload::AutoReloader;
 use serde::Serialize;
-use std::{env, fs::read_to_string, path::Path};
+use std::{fs::read_to_string, path::Path};
 
 #[derive(Serialize)]
 struct NavLink<'a> {
@@ -10,14 +10,13 @@ struct NavLink<'a> {
     href: &'a str,
 }
 
-pub fn load_templates_dyn() -> AutoReloader {
+pub fn load_templates_dyn(should_autoreload: bool) -> AutoReloader {
     AutoReloader::new(move |notifier| {
         let mut env = Environment::new();
         env.set_loader(loader);
 
         notifier.set_fast_reload(true);
 
-        let should_autoreload = env::var("AUTO_RELOAD_TEMPLATES").is_ok_and(|c| c == "true");
         if should_autoreload {
             let template_path = Path::new("templates");
             notifier.watch_path(template_path, true);

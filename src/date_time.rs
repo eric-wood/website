@@ -6,6 +6,7 @@ use serde::{
     de::{self, Visitor},
 };
 
+#[derive(Clone)]
 pub struct DateTime(chrono::DateTime<FixedOffset>);
 
 impl convert::TryFrom<String> for DateTime {
