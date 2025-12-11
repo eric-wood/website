@@ -22,6 +22,8 @@ pub fn load_templates_dyn(should_autoreload: bool) -> AutoReloader {
             notifier.watch_path(template_path, true);
         }
         env.add_function("url_escape", url_escape);
+        env.add_function("inline_style", inline_style);
+        env.add_function("inline_script", inline_script);
         env.add_global(
             "nav_links",
             Value::from_serialize([
@@ -52,8 +54,18 @@ pub fn load_templates_dyn(should_autoreload: bool) -> AutoReloader {
 }
 
 fn loader(name: &str) -> Result<Option<String>, Error> {
-    let root_path = Path::new("templates");
-    let template_path = root_path.join(format!("{name}.jinja"));
+    let is_view = name.starts_with("views");
+    let has_extension = name.ends_with(".jinja");
+    let root_path = Path::new(if is_view { "src" } else { "templates" });
+
+    let mut template_path = root_path.join(name);
+    if is_view && !has_extension {
+        template_path.push("template")
+    }
+    if !has_extension {
+        template_path.add_extension("jinja");
+    }
+
     let template = read_to_string(&template_path).map_err(|_| {
         Error::new(
             ErrorKind::TemplateNotFound,
@@ -77,4 +89,14 @@ where
 
 fn url_escape(input: String) -> String {
     urlencoding::encode(&input).into_owned()
+}
+
+fn inline_style(path: String) -> String {
+    let styles = read_to_string(path).expect("unable to locate stylesheet");
+    format!("<style type=\"text/css\">\n{styles}\n</style>")
+}
+
+fn inline_script(path: String) -> String {
+    let script = read_to_string(path).expect("unable to locate script");
+    format!("<script type=\"text/javascript\">\n{script}\n</script>")
 }

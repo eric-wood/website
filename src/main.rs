@@ -25,6 +25,7 @@ use templates::load_templates_dyn;
 use tower_http::{services::ServeDir, set_header::SetResponseHeaderLayer};
 mod config;
 use config::Config;
+mod views;
 
 use crate::blog::BlogPost;
 

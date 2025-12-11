@@ -1,9 +1,11 @@
-use crate::{AppError, AppState, Response, db, templates::render};
+use crate::{
+    AppError, AppState, Response, db,
+    views::{View, photos::PhotosShow},
+};
 use axum::{
     extract::{Path, State},
     response::Html,
 };
-use minijinja::context;
 use std::sync::Arc;
 
 pub async fn show(Path(id): Path<String>, State(state): State<Arc<AppState>>) -> Response {
@@ -15,21 +17,9 @@ pub async fn show(Path(id): Path<String>, State(state): State<Arc<AppState>>) ->
         })?;
 
     let tags = db::get_photo_tags(&state.photos_db_pool, &id).await?;
-    let aperture = format!("{:.1}", photo.aperture);
-    let focal_length = format!("{:.0}", photo.focal_length);
-    let shutter_speed = format!("1/{:.0}s", 1.0 / photo.shutter_speed);
 
-    let rendered = render(
-        &state.reloader,
-        "photos/show",
-        context! {
-            aperture,
-            focal_length,
-            shutter_speed,
-            photo,
-            tags,
-        },
-    )?;
+    let view = PhotosShow::new(photo, tags);
+    let html = view.render(&state.reloader)?;
 
-    Ok(Html(rendered))
+    Ok(Html(html))
 }
