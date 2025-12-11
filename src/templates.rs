@@ -24,6 +24,8 @@ pub fn load_templates_dyn(should_autoreload: bool) -> AutoReloader {
         env.add_function("url_escape", url_escape);
         env.add_function("inline_style", inline_style);
         env.add_function("inline_script", inline_script);
+        env.add_function("photo_thumbnail_url", photo_thumbnail_url);
+        env.add_function("photo_url", photo_url);
         env.add_global(
             "nav_links",
             Value::from_serialize([
@@ -99,4 +101,12 @@ fn inline_style(path: String) -> String {
 fn inline_script(path: String) -> String {
     let script = read_to_string(path).expect("unable to locate script");
     format!("<script type=\"text/javascript\">\n{script}\n</script>")
+}
+
+fn photo_thumbnail_url(photo_id: String) -> String {
+    format!("/photos/thumbnails/{photo_id}.webp")
+}
+
+fn photo_url(filename: String) -> String {
+    format!("/photos/images/{filename}")
 }

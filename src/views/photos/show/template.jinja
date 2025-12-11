@@ -1,5 +1,7 @@
 {% extends "layout" %}
 {% set active_page = 'photos' %}
+{% set meta_description = "Eric's photo gallery" %}
+{% set meta_image = photo_thumbnail_url(photo.id) %}
 {% block title %}Photos / View{% endblock %}
 {% block head %}
   {{ inline_style("src/views/photos/show/style.css") }}
@@ -7,7 +9,7 @@
 {% block body %}
   <div class="photo__container">
     <div class="photo__image">
-      <img src="/photos/images/{{ photo.filename }}">
+      <img src="{{ photo_url(photo.filename) }}">
     </div>
     <div class="photo__sidebar">
       <h2>Metadata</h2>

@@ -3,6 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="description" content="{{ meta_description|default("Eric, online") }}">
+    {% if meta_image is defined %}
+      <meta property="og:image" content="{{ meta_image }}">
+    {% endif %}
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="/photos/assets/fonts/inter/inter.css">
     <style type="text/css">
       :root { font-family: 'Inter', serif; }

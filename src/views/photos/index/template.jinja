@@ -1,5 +1,6 @@
 {% extends "layout" %}
-{% set active_page = 'photos' %}
+{% set active_page = "photos" %}
+{% set meta_description = "Eric's photo gallery" %}
 {% block title %}Photos{% endblock %}
 {% block head %}
   {{ inline_style("src/views/photos/index/style.css") }}
@@ -25,7 +26,7 @@
             {% if loop.index < 6 %}
               fetchpriority="high"
             {% endif %}
-              src="/photos/thumbnails/{{ photo.id }}.webp"
+              src="{{ photo_thumbnail_url(photo.id) }}"
             >
           </a>
         {% endfor %}
