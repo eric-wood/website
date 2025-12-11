@@ -6,6 +6,9 @@
     <meta name="description" content="{{ meta_description|default("Eric, online") }}">
     {% if meta_image is defined %}
       <meta property="og:image" content="{{ meta_image }}">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:image:src" content="{{ meta_image }}">
+      <meta property="og:image:height" content="500">
     {% endif %}
     <meta property="og:type" content="website">
     <link rel="stylesheet" href="/photos/assets/fonts/inter/inter.css">
