@@ -21,6 +21,7 @@
             id="{{ photo.id }}"
             data-width="{{ photo.width }}"
             data-height="{{ photo.height }}"
+            style="aspect-ratio: {{ photo.width / photo.height }}"
           >
             <img
             {% if loop.index < 6 %}

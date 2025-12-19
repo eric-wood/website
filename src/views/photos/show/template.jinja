@@ -9,7 +9,10 @@
 {% block body %}
   <div class="photo__container">
     <div class="photo__image">
-      <img src="{{ photo_url(photo.filename) }}">
+      <img
+        src="{{ photo_url(photo.filename) }}"
+        style="aspect-ratio: {{ photo.width / photo.height }}"
+      >
     </div>
     <div class="photo__sidebar">
       <h2>Metadata</h2>
