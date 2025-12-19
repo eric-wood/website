@@ -20,6 +20,9 @@ pub fn load_templates_dyn(should_autoreload: bool) -> AutoReloader {
         if should_autoreload {
             let template_path = Path::new("templates");
             notifier.watch_path(template_path, true);
+
+            let views_path = Path::new("src/views");
+            notifier.watch_path(views_path, true);
         }
         env.add_function("url_escape", url_escape);
         env.add_function("inline_style", inline_style);
