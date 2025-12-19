@@ -1,0 +1,110 @@
+.highlighted {
+  background: #0d1117;
+  --bg: #0d1117;
+  --surface: #202429;
+  color: #c9d1d9;
+  --fg: #c9d1d9;
+  --accent: #d2a8ff;
+  --muted: #8b949e;
+}
+.highlighted a-at {
+  color: #79c0ff;
+}
+.highlighted a-co {
+  color: #79c0ff;
+}
+.highlighted a-fb {
+  color: #d2a8ff;
+}
+.highlighted a-f {
+  color: #d2a8ff;
+}
+.highlighted a-k {
+  color: #ff7b72;
+}
+.highlighted a-o {
+  color: #ff7b72;
+}
+.highlighted a-pr {
+  color: #79c0ff;
+}
+.highlighted a-p {
+  color: #c9d1d9;
+}
+.highlighted a-p {
+  color: #c9d1d9;
+}
+.highlighted a-p {
+  color: #c9d1d9;
+}
+.highlighted a-p {
+  color: #79c0ff;
+}
+.highlighted a-s {
+  color: #a5d6ff;
+}
+.highlighted a-s {
+  color: #ff7b72;
+}
+.highlighted a-tg {
+  color: #7ee787;
+}
+.highlighted a-t {
+  color: #ffa657;
+}
+.highlighted a-t {
+  color: #ffa657;
+}
+.highlighted a-v {
+  color: #c9d1d9;
+}
+.highlighted a-v {
+  color: #ffa657;
+}
+.highlighted a-v {
+  color: #ffa657;
+}
+.highlighted a-c {
+  color: #8b949e;
+}
+.highlighted a-m {
+  color: #79c0ff;
+}
+.highlighted a-l {
+  color: #d2a8ff;
+}
+.highlighted a-da {
+  color: #7ee787;
+}
+.highlighted a-dd {
+  color: #ff7b72;
+}
+.highlighted a-n {
+  color: #79c0ff;
+}
+.highlighted a-tl {
+  color: #c9d1d9;
+}
+.highlighted a-em {
+  font-style: italic;
+}
+.highlighted a-st {
+  font-weight: bold;
+}
+.highlighted a-tu {
+  color: #58a6ff;
+  text-decoration: underline;
+}
+.highlighted a-tr {
+  color: #d2a8ff;
+}
+.highlighted a-se {
+  color: #79c0ff;
+}
+.highlighted a-tt {
+  color: #d2a8ff;
+  font-weight: bold;
+}
+.highlighted a-ts {
+  text-decoration: line-through;
+}

@@ -1,0 +1,9 @@
+.blog__container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+pre.highlighted {
+  padding: 20px;
+  border-radius: 6px;
+}

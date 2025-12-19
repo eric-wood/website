@@ -68,7 +68,7 @@ async fn main() -> anyhow::Result<()> {
 
     let blog_slugs = blog::load_index(&config)?;
 
-    let reloader = load_templates_dyn(config.auto_reload_templates);
+    let reloader = load_templates_dyn(&config);
     let app = Router::new()
         .nest_service(
             "/photos/assets",

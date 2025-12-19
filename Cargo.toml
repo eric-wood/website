@@ -29,3 +29,4 @@ tracing = "0.1.43"
 urlencoding = "2.1.3"
 serde_yaml = "0.9.34"
 comrak = "0.48.0"
+arborium = { version = "2.3.2", features = ["all-languages"] }

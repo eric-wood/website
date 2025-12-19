@@ -1,11 +1,16 @@
 {% extends "layout" %}
 {% set active_page = 'blog' %}
 {% block title %}Blog{% endblock %}
-
+{% block head %}
+  {{ inline_style("src/views/blog/show/style.css") }}
+  {{ inline_style("src/views/blog/show/syntax.css") }}
+{% endblock %}
 {% block body %}
-  <h1>{{ post.title }}</h1>
-  <p>
-    <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
-  </p>
+  <div class="blog__container">
+    <h1 class="blog__title">{{ post.title }}</h1>
+    <p>
+      <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
+    </p>
   {{ body }}
+  </div>
 {% endblock %}

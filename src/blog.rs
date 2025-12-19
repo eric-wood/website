@@ -5,7 +5,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use comrak::{markdown_to_html_with_plugins, options, plugins::syntect::SyntectAdapterBuilder};
+use arborium::Highlighter;
+use comrak::{adapters::SyntaxHighlighterAdapter, markdown_to_html_with_plugins, options};
 use minijinja::context;
 
 use crate::{AppState, config::Config, date_time::DateTime, templates::render};
@@ -18,6 +19,52 @@ pub struct BlogPost {
     pub file_path: PathBuf,
     #[serde(skip_deserializing)]
     pub cache_path: PathBuf,
+}
+
+#[derive(Clone)]
+struct SyntaxAdapter {}
+
+impl SyntaxAdapter {
+    pub fn new() -> Self {
+        SyntaxAdapter {}
+    }
+}
+
+impl SyntaxHighlighterAdapter for SyntaxAdapter {
+    fn write_highlighted(
+        &self,
+        output: &mut dyn std::fmt::Write,
+        lang: Option<&str>,
+        code: &str,
+    ) -> std::fmt::Result {
+        if lang.is_none() {
+            output.write_str(code)?;
+            return Ok(());
+        }
+        let lang = lang.unwrap();
+
+        let mut highlighter = Highlighter::new();
+        let html = highlighter
+            .highlight(lang, code)
+            .map_err(|_| std::fmt::Error)?;
+        output.write_str(&html)
+    }
+
+    fn write_pre_tag<'s>(
+        &self,
+        output: &mut dyn std::fmt::Write,
+        _attributes: HashMap<&'static str, std::borrow::Cow<'s, str>>,
+    ) -> std::fmt::Result {
+        output.write_str("<pre class=\"highlighted\">")
+    }
+
+    fn write_code_tag<'s>(
+        &self,
+        output: &mut dyn std::fmt::Write,
+        _attributes: HashMap<&'static str, std::borrow::Cow<'s, str>>,
+    ) -> std::fmt::Result {
+        output.write_str("<code>")
+    }
 }
 
 pub fn load_index(config: &Config) -> anyhow::Result<HashMap<String, BlogPost>> {
@@ -84,9 +131,7 @@ fn extract_frontmatter(path: &PathBuf) -> anyhow::Result<Option<BlogPost>> {
 
 pub fn render_post(path: &PathBuf) -> anyhow::Result<String> {
     let md = read_to_string(path)?;
-    let adapter = SyntectAdapterBuilder::new()
-        .theme("base16-eighties.dark")
-        .build();
+    let adapter = SyntaxAdapter::new();
     let mut plugins = options::Plugins::default();
     plugins.render.codefence_syntax_highlighter = Some(&adapter);
     let body = markdown_to_html_with_plugins(
