@@ -11,6 +11,8 @@
     <p>
       <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
     </p>
-  {{ body }}
+    <div class="blog__body">
+      {{ body }}
+    </div>
   </div>
 {% endblock %}

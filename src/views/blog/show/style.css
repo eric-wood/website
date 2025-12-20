@@ -3,7 +3,26 @@
   margin: 0 auto;
 }
 
-pre.highlighted {
+.blog__body pre {
   padding: 20px;
   border-radius: 6px;
+}
+
+.blog__body pre > code {
+  position: relative;
+  display: block;
+}
+
+.blog__body pre > code:after {
+  content: attr(data-language);
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: white;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.blog__body pre:hover > code:after {
+  opacity: 0;
 }

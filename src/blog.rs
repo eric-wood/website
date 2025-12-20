@@ -53,17 +53,31 @@ impl SyntaxHighlighterAdapter for SyntaxAdapter {
     fn write_pre_tag<'s>(
         &self,
         output: &mut dyn std::fmt::Write,
-        _attributes: HashMap<&'static str, std::borrow::Cow<'s, str>>,
+        attributes: HashMap<&'static str, std::borrow::Cow<'s, str>>,
     ) -> std::fmt::Result {
-        output.write_str("<pre class=\"highlighted\">")
+        if attributes.contains_key("lang") {
+            write!(
+                output,
+                "<pre class=\"highlighted\" data-language=\"{}\">",
+                attributes["lang"]
+            )
+        } else {
+            output.write_str("<pre class=\"highlighted\">")
+        }
     }
 
     fn write_code_tag<'s>(
         &self,
         output: &mut dyn std::fmt::Write,
-        _attributes: HashMap<&'static str, std::borrow::Cow<'s, str>>,
+        attributes: HashMap<&'static str, std::borrow::Cow<'s, str>>,
     ) -> std::fmt::Result {
-        output.write_str("<code>")
+        // why doesn't it give us the actual language string????? hmmm????
+        if attributes.contains_key("class") {
+            let lang = attributes["class"].replace("language-", "");
+            write!(output, "<code data-language=\"{}\">", lang)
+        } else {
+            output.write_str("<code>")
+        }
     }
 }
 
