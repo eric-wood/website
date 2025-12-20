@@ -1,5 +1,6 @@
 use std::{
-    collections::HashMap,
+    borrow::Borrow,
+    collections::{HashMap, VecDeque},
     fmt::{self, Write},
     fs::{self, File, read_to_string},
     io::{BufRead, BufReader, Write as IoWrite},
@@ -8,14 +9,21 @@ use std::{
 
 use arborium::Highlighter;
 use comrak::{
+    Arena,
     adapters::{HeadingAdapter, HeadingMeta, SyntaxHighlighterAdapter},
-    markdown_to_html_with_plugins,
-    nodes::Sourcepos,
-    options,
+    arena_tree::NodeEdge,
+    html::format_document_with_plugins,
+    nodes::{AstNode, NodeValue, Sourcepos},
+    options, parse_document,
 };
-use minijinja::context;
+use serde::Serialize;
 
-use crate::{AppState, config::Config, date_time::DateTime, templates::render};
+use crate::{
+    AppState,
+    config::Config,
+    date_time::DateTime,
+    views::{View, blog::BlogShow},
+};
 
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
 pub struct BlogPost {
@@ -177,37 +185,97 @@ impl HeadingAdapter for LinkedHeadingAdapter {
     }
 }
 
-pub fn render_post(path: &PathBuf) -> anyhow::Result<String> {
+fn text_from_node<'a>(node: &'a AstNode<'a>) -> String {
+    let mut text = String::new();
+    for child in node.children() {
+        if let NodeValue::Text(s) = &child.data.borrow().value {
+            text.push_str(s.borrow());
+        } else {
+            text.push_str(&text_from_node(child));
+        }
+    }
+
+    text
+}
+
+#[derive(Serialize, Clone, Debug)]
+pub struct Section {
+    pub name: String,
+    pub slug: String,
+    pub level: u8,
+    pub subsections: Vec<Section>,
+}
+
+fn create_toc<'a>(root: &'a AstNode<'a>) -> Vec<Section> {
+    let mut sections: Vec<Section> = Vec::new();
+
+    for edge in root.traverse() {
+        if let NodeEdge::Start(node) = edge
+            && let NodeValue::Heading(ref heading) = node.data().value
+        {
+            let name = text_from_node(node);
+            let slug = slug::slugify(&name);
+            let level = heading.level;
+
+            let section = Section {
+                name,
+                slug,
+                level,
+                subsections: Vec::new(),
+            };
+            sections.push(section);
+        }
+    }
+
+    let mut toc: VecDeque<Section> = VecDeque::new();
+    let mut queue: VecDeque<Section> = VecDeque::from(sections);
+    while let Some(mut current) = queue.pop_back() {
+        while let Some(section) = toc.front()
+            && section.level > current.level
+        {
+            let section = toc.pop_front().unwrap();
+            current.subsections.push(section);
+        }
+
+        toc.push_front(current);
+    }
+
+    toc.into()
+}
+
+pub fn render_post(path: &PathBuf) -> anyhow::Result<(String, Vec<Section>)> {
     let md = read_to_string(path)?;
     let syntax_adapter = SyntaxAdapter::new();
     let heading_adapter = LinkedHeadingAdapter;
     let mut plugins = options::Plugins::default();
     plugins.render.codefence_syntax_highlighter = Some(&syntax_adapter);
     plugins.render.heading_adapter = Some(&heading_adapter);
-    let body = markdown_to_html_with_plugins(
-        &md,
-        &comrak::Options {
-            extension: options::Extension::builder()
-                .math_dollars(true)
-                .multiline_block_quotes(true)
-                .strikethrough(true)
-                .superscript(true)
-                .footnotes(true)
-                .underline(true)
-                .greentext(true)
-                .autolink(true)
-                .alerts(true)
-                .table(true)
-                .math_code(true)
-                .maybe_front_matter_delimiter(Some("---".to_string()))
-                .build(),
-            parse: options::Parse::builder().build(),
-            render: options::Render::builder().build(),
-        },
-        &plugins,
-    );
+    let options = comrak::Options {
+        extension: options::Extension::builder()
+            .math_dollars(true)
+            .multiline_block_quotes(true)
+            .strikethrough(true)
+            .superscript(true)
+            .footnotes(true)
+            .underline(true)
+            .greentext(true)
+            .autolink(true)
+            .alerts(true)
+            .table(true)
+            .math_code(true)
+            .maybe_front_matter_delimiter(Some("---".to_string()))
+            .build(),
+        parse: options::Parse::builder().build(),
+        render: options::Render::builder().build(),
+    };
+    let arena = Arena::new();
+    let root = parse_document(&arena, &md, &options);
+    let toc = create_toc(root);
 
-    Ok(body)
+    let mut body = String::new();
+    format_document_with_plugins(root, &options, &mut body, &plugins)?;
+
+    Ok((body, toc))
 }
 
 // Render all of our blog posts as fully static HTML files so we can serve them up without having
@@ -219,18 +287,10 @@ pub fn cache_posts(state: &AppState) -> anyhow::Result<()> {
     }
 
     for post in state.blog_slugs.values() {
-        let body = render_post(&post.file_path)?;
-        let post = post.clone();
-        let rendered = render(
-            &state.reloader,
-            "blog/show",
-            context! {
-                post,
-                body,
-            },
-        )?;
+        let view = BlogShow::new(post);
+        let rendered = view.render(&state.reloader)?;
 
-        let mut file = File::create(post.cache_path)?;
+        let mut file = File::create(post.cache_path.clone())?;
         file.write_all(rendered.as_bytes())?;
     }
 
