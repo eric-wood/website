@@ -1,3 +1,17 @@
+pre.highlighted code:after {
+  content: attr(data-language);
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: white;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+pre.highlighted:hover code:after {
+  opacity: 0;
+}
+
 .highlighted {
   background: #0d1117;
   --bg: #0d1117;

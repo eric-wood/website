@@ -3,7 +3,9 @@
 {% block title %}Blog{% endblock %}
 {% block head %}
   {{ inline_style("src/views/blog/show/style.css") }}
-  {{ inline_style("src/views/blog/show/syntax.css") }}
+  {% if has_code %}
+    {{ inline_style("src/views/blog/show/syntax.css") }}
+  {% endif %}
 {% endblock %}
 {% block body %}
   <div class="blog__container">

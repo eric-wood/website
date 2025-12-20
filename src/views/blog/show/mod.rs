@@ -20,12 +20,14 @@ impl<'a> BlogShow<'a> {
 impl<'a> View for BlogShow<'a> {
     fn render(&self, reloader: &AutoReloader) -> anyhow::Result<String> {
         let body = render_post(&self.post.file_path)?;
+        let has_code = body.contains("<pre class=\"highlighted\">");
         let html = render(
             reloader,
             "views/blog/show",
             context! {
                 post => self.post,
                 body,
+                has_code,
             },
         )?;
 
