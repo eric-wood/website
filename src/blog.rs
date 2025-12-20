@@ -1,12 +1,18 @@
 use std::{
     collections::HashMap,
+    fmt::{self, Write},
     fs::{self, File, read_to_string},
-    io::{BufRead, BufReader, Write},
+    io::{BufRead, BufReader, Write as IoWrite},
     path::{Path, PathBuf},
 };
 
 use arborium::Highlighter;
-use comrak::{adapters::SyntaxHighlighterAdapter, markdown_to_html_with_plugins, options};
+use comrak::{
+    adapters::{HeadingAdapter, HeadingMeta, SyntaxHighlighterAdapter},
+    markdown_to_html_with_plugins,
+    nodes::Sourcepos,
+    options,
+};
 use minijinja::context;
 
 use crate::{AppState, config::Config, date_time::DateTime, templates::render};
@@ -98,8 +104,8 @@ pub fn load_index(config: &Config) -> anyhow::Result<HashMap<String, BlogPost>> 
         .collect();
 
     for file_name in names {
-        let mut slug = file_name.replace("_", "-");
-        slug.replace_last(".md", "");
+        let mut slug = slug::slugify(&file_name);
+        slug.replace_last("-md", "");
         let path = root_path.join(file_name).clone();
 
         let maybe_post = extract_frontmatter(&path)?;
@@ -143,11 +149,41 @@ fn extract_frontmatter(path: &PathBuf) -> anyhow::Result<Option<BlogPost>> {
     Ok(Some(post))
 }
 
+struct LinkedHeadingAdapter;
+
+impl HeadingAdapter for LinkedHeadingAdapter {
+    fn enter(
+        &self,
+        output: &mut dyn Write,
+        heading: &HeadingMeta,
+        _sourcepos: Option<Sourcepos>,
+    ) -> fmt::Result {
+        let id = slug::slugify(&heading.content);
+
+        write!(
+            output,
+            "<div class=\"blog__heading\" id=\"{}\">\n<h{}>",
+            id, heading.level
+        )
+    }
+
+    fn exit(&self, output: &mut dyn Write, heading: &HeadingMeta) -> fmt::Result {
+        let id = slug::slugify(&heading.content);
+        write!(
+            output,
+            "</h{}><a href=\"#{}\" aria-label=\"Permalink: {}\">#</a></div>",
+            heading.level, id, heading.content
+        )
+    }
+}
+
 pub fn render_post(path: &PathBuf) -> anyhow::Result<String> {
     let md = read_to_string(path)?;
-    let adapter = SyntaxAdapter::new();
+    let syntax_adapter = SyntaxAdapter::new();
+    let heading_adapter = LinkedHeadingAdapter;
     let mut plugins = options::Plugins::default();
-    plugins.render.codefence_syntax_highlighter = Some(&adapter);
+    plugins.render.codefence_syntax_highlighter = Some(&syntax_adapter);
+    plugins.render.heading_adapter = Some(&heading_adapter);
     let body = markdown_to_html_with_plugins(
         &md,
         &comrak::Options {

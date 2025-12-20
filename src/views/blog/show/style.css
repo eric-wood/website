@@ -13,3 +13,27 @@
   display: block;
 }
 
+.blog__heading {
+  position: relative;
+  scroll-margin-top: 20px;
+}
+
+.blog__heading a {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateX(calc(-100% - 5px)) translateY(-50%);
+  color: black;
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.blog__heading:hover a,
+.blog__heading:hover a,
+.blog__heading:hover a,
+.blog__heading:hover a,
+.blog__heading:hover a {
+  opacity: 0.75;
+}
+
