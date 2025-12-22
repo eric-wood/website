@@ -37,6 +37,7 @@ pub fn load_templates_dyn(config: &Config) -> AutoReloader {
         env.add_function("inline_script", inline_script);
         env.add_function("photo_thumbnail_url", photo_thumbnail_url);
         env.add_function("photo_url", photo_url);
+        env.add_function("assets_path", assets_path);
         env.add_global(
             "nav_links",
             Value::from_serialize([
@@ -120,4 +121,8 @@ fn photo_thumbnail_url(photo_id: String) -> String {
 
 fn photo_url(filename: String) -> String {
     format!("/photos/images/{filename}")
+}
+
+fn assets_path(path: String) -> String {
+    format!("/photos/assets/{path}")
 }

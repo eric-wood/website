@@ -79,3 +79,20 @@ document.querySelectorAll(".mobile-nav-toggle").forEach((el) => {
     document.querySelector(".photos__nav").classList.toggle("open");
   });
 });
+
+const initSort = () => {
+  const select = document.getElementById("sort");
+  if (!select) {
+    return;
+  }
+
+  select.addEventListener("change", (event) => {
+    const url = new URL(window.location);
+    url.searchParams.set('sort', event.target.value);
+    window.location = url.search;
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initSort();
+});

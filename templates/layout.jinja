@@ -3,6 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180"    href="{{ assets_path("apple-touch-icon.png") }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ assets_path("favicon-32x32.png") }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ assets_path("favicon-16x16.png") }}">
+    <link rel="manifest" href="{{ assets_path("site.webmanifest") }}">
     <meta name="description" content="{{ meta_description|default("Eric, online") }}">
     {% if meta_image is defined %}
       <meta property="og:image" content="{{ meta_image }}">
@@ -11,7 +15,7 @@
       <meta property="og:image:height" content="500">
     {% endif %}
     <meta property="og:type" content="website">
-    <link rel="stylesheet" href="/photos/assets/fonts/inter/inter.css">
+    <link rel="stylesheet" href="{{ assets_path("fonts/inter/inter.css") }}">
     <style type="text/css">
       :root { font-family: 'Inter', serif; }
         @supports (font-variation-settings: normal) {
@@ -117,6 +121,7 @@
       </header>
       {% block body %}{% endblock %}
     </div>
-    <script src="/photos/assets/app.js" type="text/javascript"></script>
+
+    {{ inline_script("assets/app.js") }}
   </body>
 </html>
