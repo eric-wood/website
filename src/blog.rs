@@ -16,6 +16,7 @@ use comrak::{
     nodes::{AstNode, NodeValue, Sourcepos},
     options, parse_document,
 };
+use regex::Regex;
 use serde::Serialize;
 
 use crate::{
@@ -175,7 +176,7 @@ impl HeadingAdapter for LinkedHeadingAdapter {
 
         write!(
             output,
-            "<div class=\"blog__heading\" id=\"{}\">\n<h{}>",
+            "</section>\n<section id=\"{}\" class=\"blog__section\"><div class=\"blog__heading\">\n<h{}>",
             id, heading.level
         )
     }
@@ -248,6 +249,29 @@ fn create_toc<'a>(root: &'a AstNode<'a>) -> Vec<Section> {
     toc.into()
 }
 
+fn fix_sections(body: &str) -> String {
+    let re = Regex::new(r"<\/?section>").unwrap();
+    let mut result = body.to_string();
+    for (i, m) in re.find_iter(body).enumerate() {
+        if m.as_str() == "<section>" && i == 0 {
+            break;
+        }
+        if m.as_str() == "</section>" && i == 0 {
+            result = body.replacen("</section>", "", 1);
+            break;
+        }
+    }
+
+    let close = "</section>";
+    if let Some(i) = body.rfind("<section class=\"footnotes\"") {
+        result.insert_str(i - close.len(), close);
+    } else {
+        result += close;
+    }
+
+    result
+}
+
 pub fn render_post(path: &PathBuf) -> anyhow::Result<(String, Vec<Section>)> {
     let md = read_to_string(path)?;
     let syntax_adapter = SyntaxAdapter::new();
@@ -279,6 +303,7 @@ pub fn render_post(path: &PathBuf) -> anyhow::Result<(String, Vec<Section>)> {
 
     let mut body = String::new();
     format_document_with_plugins(root, &options, &mut body, &plugins)?;
+    body = fix_sections(&body);
 
     Ok((body, toc))
 }

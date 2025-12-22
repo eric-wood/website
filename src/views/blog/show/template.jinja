@@ -8,14 +8,21 @@
   {% endif %}
 {% endblock %}
 {% block body %}
-  <div class="blog__container">
-    <h1 class="blog__title">{{ post.title }}</h1>
-    <p>
-      <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
-    </p>
-    {{ toc_html }}
-    <div class="blog__body">
-      {{ body }}
+  <div class="blog__layout">
+    <div class="blog__header">
+      <h1 class="blog__title">{{ post.title }}</h1>
+      <p>
+        <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
+      </p>
+    </div>
+    <div class="blog__container">
+      <div class="blog__body">
+        {{ body }}
+      </div>
+      <div class="blog__toc">
+        {{ toc_html }}
+      </div>
     </div>
   </div>
+  {{ inline_script("src/views/blog/show/script.js") }}
 {% endblock %}

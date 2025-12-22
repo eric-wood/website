@@ -3066,6 +3066,7 @@ dependencies = [
  "init-tracing-opentelemetry",
  "minijinja",
  "minijinja-autoreload",
+ "regex",
  "serde",
  "serde_html_form",
  "serde_valid",
