@@ -7,6 +7,7 @@
 
 .photo__image {
   display: flex;
+  width: 100%;
 }
 
 .photo__image img {
