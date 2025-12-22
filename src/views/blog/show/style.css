@@ -1,6 +1,46 @@
-.blog__container {
-  max-width: 900px;
+.blog__layout {
+  width: fit-content;
   margin: 0 auto;
+}
+
+.blog__container {
+  display: flex;
+  gap: 60px;
+  position: relative;
+}
+
+.blog__header {
+  border-bottom: solid black 3px;
+}
+
+.blog__toc {
+  position: sticky;
+  top: 30px;
+  align-self: flex-start;
+}
+
+.blog__toc a {
+  color: rgba(0, 0, 0, 0.5);
+  text-decoration: none;
+}
+
+.blog__toc a.active, .blog__toc a:hover {
+  color: rgb(0, 0, 0);
+  text-decoration: none;
+}
+
+.blog__toc ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.blog__toc ul ul {
+  margin-left: 10px;
+}
+
+.blog__body {
+  max-width: 620px;
 }
 
 .blog__body pre {
