@@ -57,6 +57,11 @@ impl SyntaxHighlighterAdapter for SyntaxAdapter {
         }
         let lang = lang.unwrap();
 
+        if lang.is_empty() {
+            output.write_str(code)?;
+            return Ok(());
+        }
+
         let mut highlighter = Highlighter::new();
         let html = highlighter
             .highlight(lang, code)
