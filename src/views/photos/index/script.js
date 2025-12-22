@@ -67,12 +67,14 @@ const resizeObserver = new ResizeObserver((entries) => {
 resizeObserver.observe(document.body);
 
 const pageNumberSelect = document.getElementById("page_number")
-pageNumberSelect.addEventListener("change", (event) => {
-  const page = event.currentTarget.value;
-  const url = new URL(window.location);
-  url.searchParams.set("page", page);
-  window.location = url.toString();
-});
+if (pageNumberSelect) {
+  pageNumberSelect.addEventListener("change", (event) => {
+    const page = event.currentTarget.value;
+    const url = new URL(window.location);
+    url.searchParams.set("page", page);
+    window.location = url.toString();
+  });
+}
 
 document.querySelectorAll(".mobile-nav-toggle").forEach((el) => {
   el.addEventListener("click", () => {
