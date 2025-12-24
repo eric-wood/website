@@ -60,9 +60,12 @@
   white-space: break-spaces;
 }
 
+.blog__section {
+  scroll-margin-top: 20px;
+}
+
 .blog__heading {
   position: relative;
-  scroll-margin-top: 20px;
 }
 
 .blog__heading a {
