@@ -6,7 +6,7 @@ const initToc = () => {
   });
 
   Object.values(intersections).forEach((el) => {
-    document.addEventListener("click", (event) => {
+    el.addEventListener("click", (event) => {
       event.preventDefault();
       const query = event.target.getAttribute("href");
       document.querySelector(query).scrollIntoView({
