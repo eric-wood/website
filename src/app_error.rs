@@ -1,3 +1,5 @@
+use std::env;
+
 use axum::{
     http::StatusCode,
     response::{Html, IntoResponse, Response},
@@ -8,17 +10,20 @@ pub enum AppError {
     #[error("not found")]
     NotFound,
 
-    #[error("internal server error")]
-    DbError(#[from] sqlx::Error),
-
     #[error("bad request")]
     ValidationError(#[from] serde_valid::validation::Errors),
 
-    #[error("internal server error")]
-    Anyhow(#[from] anyhow::Error),
+    #[error(transparent)]
+    DbError(#[from] sqlx::Error),
 
-    #[error("internal server error")]
+    #[error(transparent)]
     IoError(#[from] std::io::Error),
+
+    #[error(transparent)]
+    TemplateError(#[from] minijinja::Error),
+
+    #[error(transparent)]
+    Anyhow(#[from] anyhow::Error),
 }
 
 impl AppError {
@@ -26,7 +31,7 @@ impl AppError {
         match self {
             Self::NotFound => StatusCode::NOT_FOUND,
             Self::ValidationError(_) => StatusCode::BAD_REQUEST,
-            Self::DbError(_) | Self::Anyhow(_) | Self::IoError(_) => {
+            Self::DbError(_) | Self::Anyhow(_) | Self::IoError(_) | Self::TemplateError(_) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
         }
@@ -35,6 +40,14 @@ impl AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        (self.status_code(), Html(self.to_string())).into_response()
+        let status_code = self.status_code();
+        let is_dev = env::var("ENVIRONMENT").unwrap_or("development".to_string()) == "development";
+        let body = if status_code == StatusCode::INTERNAL_SERVER_ERROR && !is_dev {
+            "internal server error".to_string()
+        } else {
+            self.to_string()
+        };
+
+        (self.status_code(), Html(body)).into_response()
     }
 }
