@@ -15,7 +15,7 @@ init-tracing-opentelemetry = { version = "0.34.0", features = [
   "tracing_subscriber_ext",
   "metrics",
 ] }
-minijinja = { version = "2.12.0", features = ["loader"] }
+minijinja = { version = "2.12.0", features = ["loader", "debug"] }
 minijinja-autoreload = "2.12.0"
 serde = "1.0.228"
 serde_html_form = "0.2.8"
@@ -32,3 +32,4 @@ comrak = "0.48.0"
 arborium = { version = "2.3.2", features = ["all-languages"] }
 slug = "0.1.6"
 regex = "1.12.2"
+html-escape = "0.2.13"

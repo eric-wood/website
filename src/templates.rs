@@ -15,10 +15,12 @@ struct NavLink<'a> {
 pub fn load_templates_dyn(config: &Config) -> AutoReloader {
     let should_autoreload = config.auto_reload_templates;
     let blog_posts_path_str = config.blog_posts_path.clone();
+    let is_prod = config.is_prod();
 
     AutoReloader::new(move |notifier| {
         let mut env = Environment::new();
         env.set_loader(loader);
+        env.set_debug(!is_prod);
 
         notifier.set_fast_reload(true);
 
@@ -92,13 +94,17 @@ fn loader(name: &str) -> Result<Option<String>, Error> {
     Ok(Some(template))
 }
 
-pub fn render<S>(reloader: &AutoReloader, name: &str, context: S) -> anyhow::Result<String>
+pub fn render<S>(
+    reloader: &AutoReloader,
+    name: &str,
+    context: S,
+) -> Result<String, minijinja::Error>
 where
     S: Serialize,
 {
     let template_env = reloader.acquire_env()?;
     let template = template_env.get_template(name)?;
-    Ok(template.render(context)?)
+    template.render(context)
 }
 
 fn url_escape(input: String) -> String {

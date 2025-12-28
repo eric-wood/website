@@ -45,9 +45,53 @@ impl IntoResponse for AppError {
         let body = if status_code == StatusCode::INTERNAL_SERVER_ERROR && !is_dev {
             "internal server error".to_string()
         } else {
-            self.to_string()
+            let body = if let Self::Anyhow(e) = &self
+                && let Some(template_error) = e.downcast_ref::<minijinja::Error>()
+            {
+                let debug = template_error.display_debug_info().to_string();
+                let kind = template_error.kind();
+                let detail = template_error.detail().unwrap_or_default();
+                let name = template_error.name().unwrap_or_default();
+                let line = template_error.line().unwrap_or_default();
+
+                format!("{kind}: {detail}\n{name}:{line}\n{}", debug)
+            } else {
+                format!("{:#?}", self)
+            };
+
+            render_error(body)
         };
 
         (self.status_code(), Html(body)).into_response()
     }
+}
+
+fn render_error(body: String) -> String {
+    let style = r#"
+        body {
+            padding: 30px;
+            font-family: sans-serif;
+        }
+
+        pre {
+            background-color: #eee;
+            padding: 20px;
+            border-radius: 6px;
+        }
+    "#;
+
+    format!(
+        r#"
+<html>
+    <head>
+        <style type="text/css">{style}</style>
+    </head>
+    <body>
+        <h1>Error:</h1>
+        <pre><code>{}</code></pre>
+    </body>
+</html>
+"#,
+        html_escape::encode_text(&body)
+    )
 }
