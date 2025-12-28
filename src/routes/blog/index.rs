@@ -2,12 +2,25 @@ use crate::{
     AppState, Response,
     views::{View, blog::BlogIndex},
 };
-use axum::{extract::State, response::Html};
+use axum::{
+    extract::{Query, State},
+    response::Html,
+};
+use serde::Deserialize;
 use std::sync::Arc;
 
-pub async fn index(State(state): State<Arc<AppState>>) -> Response {
-    let slugs: Vec<&String> = state.blog_slugs.keys().collect();
-    let view = BlogIndex::new(slugs);
+#[derive(Deserialize)]
+pub struct IndexParams {
+    pub tag: Option<String>,
+}
+
+pub async fn index(query: Query<IndexParams>, State(state): State<Arc<AppState>>) -> Response {
+    let posts = if let Some(tag) = query.tag.clone() {
+        state.blog_store.get_by_tag(&tag)
+    } else {
+        state.blog_store.all()
+    };
+    let view = BlogIndex::new(posts);
     let html = view.render(&state.reloader)?;
 
     Ok(Html(html))

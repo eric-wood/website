@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use minijinja::context;
 use minijinja_autoreload::AutoReloader;
 
@@ -7,17 +9,17 @@ use crate::{
     views::View,
 };
 
-pub struct BlogShow<'a> {
-    post: &'a BlogPost,
+pub struct BlogShow {
+    post: Arc<BlogPost>,
 }
 
-impl<'a> BlogShow<'a> {
-    pub fn new(post: &'a BlogPost) -> Self {
+impl BlogShow {
+    pub fn new(post: Arc<BlogPost>) -> Self {
         Self { post }
     }
 }
 
-impl<'a> View for BlogShow<'a> {
+impl View for BlogShow {
     fn render(&self, reloader: &AutoReloader) -> anyhow::Result<String> {
         let (body, toc) = render_post(&self.post.file_path)?;
         let has_code = body.contains("<pre class=\"highlighted\">");

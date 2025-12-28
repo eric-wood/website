@@ -7,7 +7,7 @@ use axum::{
 };
 use dotenvy::dotenv;
 use minijinja_autoreload::AutoReloader;
-use std::{collections::HashMap, fs, path::Path, sync::Arc};
+use std::{fs, path::Path, sync::Arc};
 use tower::ServiceBuilder;
 mod app_error;
 use app_error::AppError;
@@ -27,13 +27,13 @@ mod config;
 use config::Config;
 mod views;
 
-use crate::blog::BlogPost;
+use crate::blog::BlogStore;
 
 struct AppState {
     config: Config,
     reloader: AutoReloader,
     photos_db_pool: SqlitePool,
-    blog_slugs: HashMap<String, BlogPost>,
+    blog_store: BlogStore,
 }
 
 type Response = Result<Html<String>, AppError>;
@@ -66,7 +66,7 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("connected to DB");
 
-    let blog_slugs = blog::load_index(&config)?;
+    let blog_store = blog::BlogStore::new(&config)?;
 
     let reloader = load_templates_dyn(&config);
     let app = Router::new()
@@ -106,7 +106,7 @@ async fn main() -> anyhow::Result<()> {
         config,
         reloader,
         photos_db_pool,
-        blog_slugs,
+        blog_store,
     });
 
     blog::cache_posts(&app_state)?;

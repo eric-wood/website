@@ -4,8 +4,13 @@
 
 {% block body %}
 <ul>
-{% for slug in slugs %}
-  <li><a href="/blog/{{ slug }}">{{ slug }}</a></li>
+{% for post in posts %}
+  <li>
+    <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
+    {% for tag in post.tags %}
+      <a href="/blog?tag={{ tag }}">{{ tag }}</a>
+    {% endfor %}
+  </li>
 {% endfor %}
 </ul>
 {% endblock %}

@@ -5,6 +5,7 @@ use std::{
     fs::{self, File, read_to_string},
     io::{BufRead, BufReader, Write as IoWrite},
     path::{Path, PathBuf},
+    sync::Arc,
 };
 
 use arborium::Highlighter;
@@ -17,7 +18,7 @@ use comrak::{
     options, parse_document,
 };
 use regex::Regex;
-use serde::Serialize;
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::{
     AppState,
@@ -26,14 +27,97 @@ use crate::{
     views::{View, blog::BlogShow},
 };
 
+pub struct BlogStore {
+    by_slug: HashMap<String, Arc<BlogPost>>,
+    by_tag: HashMap<String, Vec<Arc<BlogPost>>>,
+}
+
+impl BlogStore {
+    pub fn new(config: &Config) -> anyhow::Result<Self> {
+        let root_path = Path::new(&config.blog_posts_path);
+        let mut by_slug = HashMap::new();
+        let mut by_tag: HashMap<String, Vec<Arc<BlogPost>>> = HashMap::new();
+
+        let names: Vec<String> = fs::read_dir(root_path)?
+            .filter_map(|i| i.ok())
+            .filter_map(|entry| {
+                let file_name = entry.file_name().into_string().unwrap_or("".to_string());
+                if !file_name.ends_with("md") {
+                    return None;
+                }
+
+                Some(file_name)
+            })
+            .collect();
+
+        for file_name in names {
+            let mut slug = slug::slugify(&file_name);
+            slug.replace_last("-md", "");
+            let path = root_path.join(file_name).clone();
+
+            let maybe_post = extract_frontmatter(&path)?;
+
+            if let Some(mut post) = maybe_post {
+                post.slug = Some(slug.clone());
+                post.file_path = path;
+                post.cache_path = Path::new(&config.cache_path).join("blog").join(&slug);
+                let post = Arc::new(post);
+                by_slug.insert(slug, post.clone());
+
+                for tag in post.tags.iter() {
+                    if let Some(tag_posts) = by_tag.get_mut(tag) {
+                        tag_posts.push(post.clone());
+                    } else {
+                        by_tag.insert(tag.clone(), vec![post.clone()]);
+                    }
+                }
+            }
+        }
+
+        Ok(Self { by_slug, by_tag })
+    }
+
+    pub fn all(&self) -> Vec<Arc<BlogPost>> {
+        self.by_slug.values().cloned().collect()
+    }
+
+    pub fn get_by_slug(&self, slug: &str) -> Option<Arc<BlogPost>> {
+        self.by_slug.get(slug).map(|i| (*i).clone())
+    }
+
+    pub fn get_by_tag(&self, tag: &str) -> Vec<Arc<BlogPost>> {
+        self.by_tag
+            .get(tag)
+            .unwrap_or(&Vec::<Arc<BlogPost>>::new())
+            .iter()
+            .map(|i| (*i).clone())
+            .collect()
+    }
+}
+
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
 pub struct BlogPost {
     pub title: Option<String>,
     pub published_at: Option<DateTime>,
+    pub slug: Option<String>,
+    #[serde(deserialize_with = "deserialize_tags")]
+    pub tags: Vec<String>,
     #[serde(skip_deserializing)]
     pub file_path: PathBuf,
     #[serde(skip_deserializing)]
     pub cache_path: PathBuf,
+}
+
+fn deserialize_tags<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let str_sequence = String::deserialize(deserializer).unwrap_or_default();
+    Ok(str_sequence
+        .replace(", ", ",")
+        .split(',')
+        .map(|i| i.to_owned())
+        .collect())
 }
 
 #[derive(Clone)]
@@ -99,38 +183,6 @@ impl SyntaxHighlighterAdapter for SyntaxAdapter {
             output.write_str("<code>")
         }
     }
-}
-
-pub fn load_index(config: &Config) -> anyhow::Result<HashMap<String, BlogPost>> {
-    let root_path = Path::new(&config.blog_posts_path);
-    let mut map = HashMap::new();
-
-    let names: Vec<String> = fs::read_dir(root_path)?
-        .filter_map(|i| i.ok())
-        .filter_map(|entry| {
-            let file_name = entry.file_name().into_string().unwrap_or("".to_string());
-            if !file_name.ends_with("md") {
-                return None;
-            }
-
-            Some(file_name)
-        })
-        .collect();
-
-    for file_name in names {
-        let mut slug = slug::slugify(&file_name);
-        slug.replace_last("-md", "");
-        let path = root_path.join(file_name).clone();
-
-        let maybe_post = extract_frontmatter(&path)?;
-
-        if let Some(mut post) = maybe_post {
-            post.file_path = path;
-            post.cache_path = Path::new(&config.cache_path).join("blog").join(&slug);
-            map.insert(slug, post);
-        }
-    }
-    Ok(map)
 }
 
 fn extract_frontmatter(path: &PathBuf) -> anyhow::Result<Option<BlogPost>> {
@@ -316,8 +368,8 @@ pub fn cache_posts(state: &AppState) -> anyhow::Result<()> {
         return Ok(());
     }
 
-    for post in state.blog_slugs.values() {
-        let view = BlogShow::new(post);
+    for post in state.blog_store.all() {
+        let view = BlogShow::new(post.clone());
         let rendered = view.render(&state.reloader)?;
 
         let mut file = File::create(post.cache_path.clone())?;
