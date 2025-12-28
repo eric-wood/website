@@ -82,16 +82,14 @@ impl BlogStore {
     }
 
     pub fn get_by_slug(&self, slug: &str) -> Option<Arc<BlogPost>> {
-        self.by_slug.get(slug).map(|i| (*i).clone())
+        self.by_slug.get(slug).cloned()
     }
 
     pub fn get_by_tag(&self, tag: &str) -> Vec<Arc<BlogPost>> {
         self.by_tag
             .get(tag)
             .unwrap_or(&Vec::<Arc<BlogPost>>::new())
-            .iter()
-            .map(|i| (*i).clone())
-            .collect()
+            .to_vec()
     }
 }
 
