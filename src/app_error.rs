@@ -44,7 +44,7 @@ impl IntoResponse for AppError {
         let is_dev = env::var("ENVIRONMENT").unwrap_or("development".to_string()) == "development";
         let body = if status_code == StatusCode::INTERNAL_SERVER_ERROR && !is_dev {
             "internal server error".to_string()
-        } else {
+        } else if status_code == StatusCode::INTERNAL_SERVER_ERROR {
             let body = if let Self::Anyhow(e) = &self
                 && let Some(template_error) = e.downcast_ref::<minijinja::Error>()
             {
@@ -60,6 +60,8 @@ impl IntoResponse for AppError {
             };
 
             render_error(body)
+        } else {
+            self.to_string()
         };
 
         (self.status_code(), Html(body)).into_response()
