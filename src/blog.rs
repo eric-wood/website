@@ -81,6 +81,17 @@ impl BlogStore {
         self.by_slug.values().cloned().collect()
     }
 
+    pub fn all_tags(&self) -> Vec<(String, usize)> {
+        let mut tags: Vec<(String, usize)> = self
+            .by_tag
+            .iter()
+            .map(|(k, v)| (k.clone(), v.len()))
+            .collect();
+        tags.sort_by(|a, b| b.1.cmp(&a.1));
+
+        tags
+    }
+
     pub fn get_by_slug(&self, slug: &str) -> Option<Arc<BlogPost>> {
         self.by_slug.get(slug).cloned()
     }

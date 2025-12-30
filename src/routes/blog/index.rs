@@ -20,7 +20,9 @@ pub async fn index(query: Query<IndexParams>, State(state): State<Arc<AppState>>
     } else {
         state.blog_store.all()
     };
-    let view = BlogIndex::new(posts);
+
+    let tags = state.blog_store.all_tags();
+    let view = BlogIndex::new(posts, tags, query.tag.clone());
     let html = view.render(&state.reloader)?;
 
     Ok(Html(html))

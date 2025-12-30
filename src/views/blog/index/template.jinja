@@ -3,12 +3,22 @@
 {% block title %}Blog{% endblock %}
 
 {% block body %}
+Tags:
+<ul>
+  {% for t in tags %}
+    {% if t[0] != tag %}
+      <li>
+        <a href="/blog?tag={{ url_escape(t[0]) }}">{{ t[0] }} {{ t[1] }}</a>
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
 <ul>
 {% for post in posts %}
   <li>
     <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
-    {% for tag in post.tags %}
-      <a href="/blog?tag={{ tag }}">{{ tag }}</a>
+    {% for t in post.tags %}
+      <a href="/blog?tag={{ url_escape(t) }}">{{ t }}</a>
     {% endfor %}
   </li>
 {% endfor %}

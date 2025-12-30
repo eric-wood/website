@@ -7,11 +7,13 @@ use crate::{blog::BlogPost, templates::render, views::View};
 
 pub struct BlogIndex {
     posts: Vec<Arc<BlogPost>>,
+    tags: Vec<(String, usize)>,
+    tag: Option<String>,
 }
 
 impl BlogIndex {
-    pub fn new(posts: Vec<Arc<BlogPost>>) -> Self {
-        Self { posts }
+    pub fn new(posts: Vec<Arc<BlogPost>>, tags: Vec<(String, usize)>, tag: Option<String>) -> Self {
+        Self { posts, tags, tag }
     }
 }
 
@@ -21,7 +23,9 @@ impl View for BlogIndex {
             reloader,
             "views/blog/index",
             context! {
-                posts => self.posts
+                posts => self.posts,
+                tags => self.tags,
+                tag => self.tag,
             },
         )?;
 
