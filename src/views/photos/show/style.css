@@ -22,7 +22,7 @@
 
 .photo__sidebar h2 {
   font-size: 10pt;
-  border-bottom: solid black 2px;
+  border-bottom: solid var(--foreground) 2px;
   margin: 0;
   padding: 0;
   text-transform: uppercase;
@@ -44,7 +44,7 @@
   align-items: flex-end;
   gap: 30px;
   font-size: 15pt;
-  border-bottom: solid black 1px;
+  border-bottom: solid var(--foreground) 1px;
 }
 
   
@@ -85,8 +85,8 @@
 .photo__tag a {
   border-radius: 5px;
   padding: 3px 7px;
-  background-color: #e4e4e4;
-  color: black;
+  background-color: var(--light);
+  color: var(--foreground);
   text-decoration: none;
 }
 

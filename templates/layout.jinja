@@ -23,6 +23,13 @@
         }
     </style>
     <style type="text/css">
+      :root {
+        --foreground: black;
+        --background: white;
+        --half: color-mix(in srgb, var(--foreground) 50%, transparent);
+        --light: color-mix(in srgb, var(--foreground) 10%, transparent);
+      }
+
       * {
         box-sizing: border-box;
       }
@@ -32,6 +39,8 @@
         min-height: 100%;
         margin: 0;
         padding: 0;
+        color: var(--foreground);
+        background-color: var(--background);
       }
 
       body {
@@ -50,16 +59,17 @@
         display: flex;
         font-size: 16pt;
         width: 100%;
-        border-bottom: solid black 3px;
+        border-bottom: solid var(--foreground) 3px;
       }
 
       header h1 {
+        color: var(--foreground);
         text-transform: uppercase;
         font-weight: 900;
         margin: 0;
         letter-spacing: 3px;
         padding: 10px 30px;
-        border-right: solid black 3px;
+        border-right: solid var(--foreground) 3px;
       }
 
       header nav ul {
@@ -75,13 +85,13 @@
         align-items: center;
         height: 100%;
         text-decoration: none;
-        color: black;
+        color: var(--foreground);
         padding: 0 30px;
       }
 
       header nav ul a.active, header nav ul a:hover {
-        background-color: black;
-        color: white;
+        background-color: var(--foreground);
+        color: var(--background);
       }
 
       @media (max-width: 850px) {

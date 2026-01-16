@@ -44,7 +44,7 @@
 
 .pagination .arrow {
   text-decoration: none;
-  color: black;
+  color: var(--foreground);
   font-size: 22pt;
 }
 
@@ -92,11 +92,11 @@
 
 .photos__nav a {
   text-decoration: none;
-  color: black;
+  color: var(--foreground);
 }
 
 .photos__nav a:visited {
-  color: black;
+  color: var(--foreground);
 }
 
 .photos__nav ul {
@@ -118,7 +118,7 @@
   width: fit-content;
   gap: 10px;
   border-radius: 5px;
-  background-color: #e4e4e4;
+  background-color: var(--light);
 }
 
 .photos__nav li.selected a {
@@ -138,7 +138,7 @@
 }
 
 .photos__mobile-nav button {
-  border: solid black 1px;
+  border: solid var(--foreground) 1px;
   border-radius: 5px;
   padding: 5px 10px;
   background: none;
@@ -148,7 +148,7 @@
 
 .photos__mobile-nav .sort {
   text-decoration: none;
-  color: black;
+  color: var(--foreground);
   font-size: 14pt;
 }
 
@@ -166,7 +166,7 @@
     right: 0;
     bottom: 0;
     padding: 30px;
-    background: white;
+    background: var(--background);
   }
 
   .photos__nav .close {

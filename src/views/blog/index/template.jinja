@@ -5,6 +5,11 @@
 {% block body %}
 Tags:
 <ul>
+  {% if tag %}
+    <li>
+      {{ tag }} <a href="/blog">X</a>
+    </li>
+  {% endif %}
   {% for t in tags %}
     {% if t[0] != tag %}
       <li>
@@ -20,6 +25,7 @@ Tags:
     {% for t in post.tags %}
       <a href="/blog?tag={{ url_escape(t) }}">{{ t }}</a>
     {% endfor %}
+      <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
   </li>
 {% endfor %}
 </ul>

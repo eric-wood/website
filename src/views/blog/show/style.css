@@ -10,7 +10,7 @@
 }
 
 .blog__header {
-  border-bottom: solid black 3px;
+  border-bottom: solid var(--foreground) 3px;
 }
 
 .blog__toc {
@@ -20,12 +20,12 @@
 }
 
 .blog__toc a {
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--half);
   text-decoration: none;
 }
 
 .blog__toc a.active, .blog__toc a:hover {
-  color: rgb(0, 0, 0);
+  color: var(--foreground);
   text-decoration: none;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .blog__body code {
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: var(--light);
   padding: 0.2em 0.4em;
   border-radius: 6px;
   white-space: break-spaces;
@@ -73,7 +73,7 @@
   top: 50%;
   left: 0;
   transform: translateX(calc(-100% - 5px)) translateY(-50%);
-  color: black;
+  color: var(--foreground);
   text-decoration: none;
   opacity: 0;
   transition: opacity 0.3s;
