@@ -1,3 +1,4 @@
+use core::cmp::Ord;
 use std::{convert, fmt, str};
 
 use chrono::{self, FixedOffset, ParseError};
@@ -6,8 +7,14 @@ use serde::{
     de::{self, Visitor},
 };
 
-#[derive(Clone)]
+#[derive(Clone, PartialOrd, Ord)]
 pub struct DateTime(chrono::DateTime<FixedOffset>);
+
+impl DateTime {
+    pub fn min_date() -> Self {
+        Self(chrono::DateTime::<FixedOffset>::MIN_UTC.fixed_offset())
+    }
+}
 
 impl convert::TryFrom<String> for DateTime {
     type Error = ParseError;
@@ -29,6 +36,14 @@ impl convert::From<&DateTime> for String {
         value.0.to_rfc3339()
     }
 }
+
+impl PartialEq for DateTime {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+
+impl Eq for DateTime {}
 
 struct DateTimeVisitor;
 

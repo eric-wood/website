@@ -78,7 +78,9 @@ impl BlogStore {
     }
 
     pub fn all(&self) -> Vec<Arc<BlogPost>> {
-        self.by_slug.values().cloned().collect()
+        let mut posts: Vec<Arc<BlogPost>> = self.by_slug.values().cloned().collect();
+        sort_posts(&mut posts);
+        posts
     }
 
     pub fn all_tags(&self) -> Vec<(String, usize)> {
@@ -97,11 +99,22 @@ impl BlogStore {
     }
 
     pub fn get_by_tag(&self, tag: &str) -> Vec<Arc<BlogPost>> {
-        self.by_tag
+        let mut posts = self
+            .by_tag
             .get(tag)
             .unwrap_or(&Vec::<Arc<BlogPost>>::new())
-            .to_vec()
+            .to_vec();
+        sort_posts(&mut posts);
+        posts
     }
+}
+
+fn sort_posts(posts: &mut [Arc<BlogPost>]) {
+    posts.sort_by(|a, b| {
+        let a = a.published_at.clone().unwrap_or(DateTime::min_date());
+        let b = b.published_at.clone().unwrap_or(DateTime::min_date());
+        b.cmp(&a)
+    });
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
