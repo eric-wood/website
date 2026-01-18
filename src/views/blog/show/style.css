@@ -1,14 +1,3 @@
-.blog__layout {
-  width: fit-content;
-  margin: 0 auto;
-}
-
-.blog__container {
-  display: flex;
-  gap: 60px;
-  position: relative;
-}
-
 .blog__header {
   border-bottom: solid var(--foreground) 3px;
 }
