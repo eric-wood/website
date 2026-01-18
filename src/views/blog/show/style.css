@@ -1,11 +1,38 @@
 .blog__header {
-  border-bottom: solid var(--foreground) 3px;
+  border-bottom: solid var(--foreground) 2px;
+}
+
+.blog__title {
+  font-size: 26pt;
+  margin: 30px 0;
+}
+
+.blog__tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.blog__tags-title {
+  font-size: 10pt;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.blog__tag-list {
+  display: flex;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
 }
 
 .blog__toc {
   position: sticky;
   top: 30px;
   align-self: flex-start;
+  margin-top: 30px;
 }
 
 .blog__toc a {
@@ -30,6 +57,7 @@
 
 .blog__body {
   max-width: 620px;
+  width: 100%;
 }
 
 .blog__body pre {

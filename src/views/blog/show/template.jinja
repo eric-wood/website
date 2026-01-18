@@ -11,15 +11,16 @@
 {% block body %}
   <div class="blog__layout">
     <div class="blog__header">
-      <h2 class="blog__title">{{ post.title }}</h2>
-      <p>
+      <h1 class="blog__title">{{ post.title }}</h1>
+      <div>
+        <span class="blog__tags-title">Posted</span>
         <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
-      </p>
+      </div>
       <div class="blog__tags">
         <span class="blog__tags-title">Filed Under</span>
         <ul class="blog__tag-list">
           {% for tag in post.tags %}
-            <li><a href="/blog?tag={{ tag }}">{{ tag }}</a></li>
+            <li><a class="tag" href="/blog?tag={{ tag }}">{{ tag }}</a></li>
           {% endfor %}
         </ul>
       </div>
