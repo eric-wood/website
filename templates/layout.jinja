@@ -47,12 +47,17 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        height: 100%;
       }
 
       .container {
         width: 100%;
+        height: 100%;
         max-width: 3000px;
         overflow: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
       }
 
       header {
@@ -103,33 +108,44 @@
           flex-direction: column;
         }
       }
+
+      footer {
+        margin-top: 30px;
+        padding: 30px;
+        color: var(--half);
+      }
     </style>
     <title>{% block title %}{% endblock %}</title>
     {% block head %}{% endblock %}
   </head>
   <body>
     <div class="container">
-      <header>
       <div>
-        <h1>Eric Wood</h1>
-        </div>
-        <nav>
-          <ul>
-            {% set active_page = active_page|default('') %}
-            {% for link in nav_links %}
-              <li>
-                <a
-                  href="{{ link.href }}"
-                  {% if active_page == link.id %}
-                  class="active"
-                  {% endif %}
-                >{{ link.label }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </nav>
-      </header>
-      {% block body %}{% endblock %}
+        <header>
+          <div>
+            <h1>Eric Wood</h1>
+          </div>
+          <nav>
+            <ul>
+              {% set active_page = active_page|default('') %}
+              {% for link in nav_links %}
+                <li>
+                  <a
+                    href="{{ link.href }}"
+                    {% if active_page == link.id %}
+                    class="active"
+                    {% endif %}
+                  >{{ link.label }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </nav>
+        </header>
+        {% block body %}{% endblock %}
+      </div>
+      <footer>
+        © Eric Wood {{ year() }}
+      </footer>
     </div>
 
     {{ inline_script("assets/app.js") }}

@@ -1,3 +1,4 @@
+use chrono::Datelike;
 use minijinja::{Environment, Error, ErrorKind, Value};
 use minijinja_autoreload::AutoReloader;
 use serde::Serialize;
@@ -40,6 +41,7 @@ pub fn load_templates_dyn(config: &Config) -> AutoReloader {
         env.add_function("photo_thumbnail_url", photo_thumbnail_url);
         env.add_function("photo_url", photo_url);
         env.add_function("assets_path", assets_path);
+        env.add_function("year", year);
         env.add_global(
             "nav_links",
             Value::from_serialize([
@@ -131,4 +133,9 @@ fn photo_url(filename: String) -> String {
 
 fn assets_path(path: String) -> String {
     format!("/photos/assets/{path}")
+}
+
+fn year() -> String {
+    let year = chrono::Utc::now().year();
+    format!("{year}")
 }

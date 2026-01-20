@@ -7,7 +7,7 @@ use serde::{
     de::{self, Visitor},
 };
 
-#[derive(Clone, PartialOrd, Ord)]
+#[derive(Clone, PartialOrd, Ord, PartialEq, Eq)]
 pub struct DateTime(chrono::DateTime<FixedOffset>);
 
 impl DateTime {
@@ -36,14 +36,6 @@ impl convert::From<&DateTime> for String {
         value.0.to_rfc3339()
     }
 }
-
-impl PartialEq for DateTime {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-
-impl Eq for DateTime {}
 
 struct DateTimeVisitor;
 
