@@ -4,17 +4,17 @@ use minijinja::context;
 use minijinja_autoreload::AutoReloader;
 
 use crate::{
-    blog::{BlogPost, Section, render_post},
+    post::{Post, Section, render_post},
     templates::render,
     views::View,
 };
 
 pub struct BlogShow {
-    post: Arc<BlogPost>,
+    post: Arc<Post>,
 }
 
 impl BlogShow {
-    pub fn new(post: Arc<BlogPost>) -> Self {
+    pub fn new(post: Arc<Post>) -> Self {
         Self { post }
     }
 }

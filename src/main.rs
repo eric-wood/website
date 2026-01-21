@@ -17,7 +17,7 @@ mod models;
 mod routes;
 mod templates;
 use axum_tracing_opentelemetry::middleware::{OtelAxumLayer, OtelInResponseLayer};
-mod blog;
+mod post;
 use init_tracing_opentelemetry::TracingConfig;
 use models::{Photo, Tag};
 use sqlx::SqlitePool;
@@ -27,13 +27,14 @@ mod config;
 use config::Config;
 mod views;
 
-use crate::blog::BlogStore;
+use post::PostStore;
 
 struct AppState {
     config: Config,
     reloader: AutoReloader,
     photos_db_pool: SqlitePool,
-    blog_store: BlogStore,
+    blog_store: PostStore,
+    project_store: PostStore,
 }
 
 type Response = Result<Html<String>, AppError>;
@@ -66,7 +67,14 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("connected to DB");
 
-    let blog_store = blog::BlogStore::new(&config)?;
+    let cache_path = Path::new(&config.cache_path);
+    let blog_path = Path::new(&config.blog_posts_path);
+    let blog_cache_path = cache_path.join("blog");
+    let blog_store = PostStore::new(blog_path, blog_cache_path.as_path())?;
+
+    let project_path = Path::new(&config.projects_path);
+    let project_cache_path = cache_path.join("projects");
+    let project_store = PostStore::new(project_path, project_cache_path.as_path())?;
 
     let reloader = load_templates_dyn(&config);
     let app = Router::new()
@@ -100,16 +108,19 @@ async fn main() -> anyhow::Result<()> {
         .route("/photos", get(routes::photos::index))
         .route("/photos/{id}", get(routes::photos::show))
         .route("/blog", get(routes::blog::index))
-        .route("/blog/{slug}", get(routes::blog::show));
+        .route("/blog/{slug}", get(routes::blog::show))
+        .route("/projects", get(routes::projects::index))
+        .route("/projects/{slug}", get(routes::projects::show));
 
     let app_state = Arc::new(AppState {
         config,
         reloader,
         photos_db_pool,
         blog_store,
+        project_store,
     });
 
-    blog::cache_posts(&app_state)?;
+    post::cache_posts(&app_state)?;
 
     let app = app
         .with_state(app_state)

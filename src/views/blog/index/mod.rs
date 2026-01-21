@@ -3,16 +3,16 @@ use std::sync::Arc;
 use minijinja::context;
 use minijinja_autoreload::AutoReloader;
 
-use crate::{blog::BlogPost, templates::render, views::View};
+use crate::{post::Post, templates::render, views::View};
 
 pub struct BlogIndex {
-    posts: Vec<Arc<BlogPost>>,
+    posts: Vec<Arc<Post>>,
     tags: Vec<(String, usize)>,
     tag: Option<String>,
 }
 
 impl BlogIndex {
-    pub fn new(posts: Vec<Arc<BlogPost>>, tags: Vec<(String, usize)>, tag: Option<String>) -> Self {
+    pub fn new(posts: Vec<Arc<Post>>, tags: Vec<(String, usize)>, tag: Option<String>) -> Self {
         Self { posts, tags, tag }
     }
 }

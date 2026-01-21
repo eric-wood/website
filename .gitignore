@@ -1,4 +1,4 @@
 /target
 .env
-/blog_posts/
 .cache/
+/content/

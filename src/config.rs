@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, path::Path};
 
 #[derive(PartialEq)]
 pub enum Environment {
@@ -11,6 +11,7 @@ pub struct Config {
     pub cache_path: String,
     pub auto_reload_templates: bool,
     pub blog_posts_path: String,
+    pub projects_path: String,
     pub photos_db_path: String,
     pub photos_thumbnail_path: String,
     pub photos_image_path: String,
@@ -32,8 +33,10 @@ impl Config {
 
         let auto_reload_templates = env::var("AUTO_RELOAD_TEMPLATES").is_ok_and(|c| c == "true");
 
-        let blog_posts_path =
-            env::var("BLOG_POSTS_PATH").expect("BLOG_POSTS_PATH env variable not set");
+        let content_path = env::var("CONTENT_PATH").expect("CONTENT_PATH env variable not set");
+        let content_folder_path = Path::new(&content_path);
+        let blog_posts_path = content_folder_path.join("blog_posts").display().to_string();
+        let projects_path = content_folder_path.join("projects").display().to_string();
 
         let photos_db_path =
             env::var("PHOTOS_DB_PATH").expect("PHOTOS_DB_PATH env variable not set");
@@ -48,6 +51,7 @@ impl Config {
             cache_path,
             auto_reload_templates,
             blog_posts_path,
+            projects_path,
             photos_db_path,
             photos_thumbnail_path,
             photos_image_path,

@@ -22,23 +22,21 @@ use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::{
     AppState,
-    config::Config,
     date_time::DateTime,
     views::{View, blog::BlogShow},
 };
 
-pub struct BlogStore {
-    by_slug: HashMap<String, Arc<BlogPost>>,
-    by_tag: HashMap<String, Vec<Arc<BlogPost>>>,
+pub struct PostStore {
+    by_slug: HashMap<String, Arc<Post>>,
+    by_tag: HashMap<String, Vec<Arc<Post>>>,
 }
 
-impl BlogStore {
-    pub fn new(config: &Config) -> anyhow::Result<Self> {
-        let root_path = Path::new(&config.blog_posts_path);
+impl PostStore {
+    pub fn new(content_path: &Path, cache_path: &Path) -> anyhow::Result<Self> {
         let mut by_slug = HashMap::new();
-        let mut by_tag: HashMap<String, Vec<Arc<BlogPost>>> = HashMap::new();
+        let mut by_tag: HashMap<String, Vec<Arc<Post>>> = HashMap::new();
 
-        let names: Vec<String> = fs::read_dir(root_path)?
+        let names: Vec<String> = fs::read_dir(content_path)?
             .filter_map(|i| i.ok())
             .filter_map(|entry| {
                 let file_name = entry.file_name().into_string().unwrap_or("".to_string());
@@ -53,14 +51,14 @@ impl BlogStore {
         for file_name in names {
             let mut slug = slug::slugify(&file_name);
             slug.replace_last("-md", "");
-            let path = root_path.join(file_name).clone();
+            let path = content_path.join(file_name).clone();
 
             let maybe_post = extract_frontmatter(&path)?;
 
             if let Some(mut post) = maybe_post {
                 post.slug = Some(slug.clone());
                 post.file_path = path;
-                post.cache_path = Path::new(&config.cache_path).join("blog").join(&slug);
+                post.cache_path = cache_path.join(&slug);
                 let post = Arc::new(post);
                 by_slug.insert(slug, post.clone());
 
@@ -77,8 +75,8 @@ impl BlogStore {
         Ok(Self { by_slug, by_tag })
     }
 
-    pub fn all(&self) -> Vec<Arc<BlogPost>> {
-        let mut posts: Vec<Arc<BlogPost>> = self.by_slug.values().cloned().collect();
+    pub fn all(&self) -> Vec<Arc<Post>> {
+        let mut posts: Vec<Arc<Post>> = self.by_slug.values().cloned().collect();
         sort_posts(&mut posts);
         posts
     }
@@ -94,22 +92,22 @@ impl BlogStore {
         tags
     }
 
-    pub fn get_by_slug(&self, slug: &str) -> Option<Arc<BlogPost>> {
+    pub fn get_by_slug(&self, slug: &str) -> Option<Arc<Post>> {
         self.by_slug.get(slug).cloned()
     }
 
-    pub fn get_by_tag(&self, tag: &str) -> Vec<Arc<BlogPost>> {
+    pub fn get_by_tag(&self, tag: &str) -> Vec<Arc<Post>> {
         let mut posts = self
             .by_tag
             .get(tag)
-            .unwrap_or(&Vec::<Arc<BlogPost>>::new())
+            .unwrap_or(&Vec::<Arc<Post>>::new())
             .to_vec();
         sort_posts(&mut posts);
         posts
     }
 }
 
-fn sort_posts(posts: &mut [Arc<BlogPost>]) {
+fn sort_posts(posts: &mut [Arc<Post>]) {
     posts.sort_by(|a, b| {
         let a = a.published_at.clone().unwrap_or(DateTime::min_date());
         let b = b.published_at.clone().unwrap_or(DateTime::min_date());
@@ -118,7 +116,7 @@ fn sort_posts(posts: &mut [Arc<BlogPost>]) {
 }
 
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
-pub struct BlogPost {
+pub struct Post {
     pub title: Option<String>,
     pub published_at: Option<DateTime>,
     pub slug: Option<String>,
@@ -207,7 +205,7 @@ impl SyntaxHighlighterAdapter for SyntaxAdapter {
     }
 }
 
-fn extract_frontmatter(path: &PathBuf) -> anyhow::Result<Option<BlogPost>> {
+fn extract_frontmatter(path: &PathBuf) -> anyhow::Result<Option<Post>> {
     let file = File::open(path)?;
 
     let mut yaml = String::new();
@@ -232,7 +230,7 @@ fn extract_frontmatter(path: &PathBuf) -> anyhow::Result<Option<BlogPost>> {
         yaml.push_str(&format!("\n{line}"));
     }
 
-    let post: BlogPost = serde_yaml::from_str(&yaml)?;
+    let post: Post = serde_yaml::from_str(&yaml)?;
 
     Ok(Some(post))
 }
