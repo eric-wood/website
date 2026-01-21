@@ -2,7 +2,6 @@
 {% set active_page = 'blog' %}
 {% block title %}Blog{% endblock %}
 {% block head %}
-  {{ inline_style("src/views/blog/shared.css") }}
   {{ inline_style("src/views/blog/show/style.css") }}
   {% if has_code %}
     {{ inline_style("src/views/blog/show/syntax.css") }}

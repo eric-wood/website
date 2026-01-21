@@ -1,3 +1,9 @@
+.blog__container {
+  display: flex;
+  gap: 60px;
+  position: relative;
+}
+
 .blog__header {
   border-bottom: solid var(--foreground) 2px;
 }

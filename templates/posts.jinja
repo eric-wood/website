@@ -1,0 +1,48 @@
+{% macro header(title, tag=None) %}
+  <h2 class="posts__title">
+    → {{ title }}
+    {% if tag %}
+      / {{ tag }}
+    {% endif %}
+  </h2>
+{% endmacro %}
+
+{% macro table(posts, show_tags=true, root_path="", tag=None) %}
+  {% if show_tags %}
+    <div class="posts__tags">
+      <span class="posts__tags-title">Categories</span>
+      <ul class="posts__tag-list">
+        {% if tag %}
+          <li>
+            <a href="{{ root_path }}" class="tag active">
+              {{ tag }}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <use xlink:href="#close-icon" />
+              </svg>
+            </a>
+          </li>
+        {% endif %}
+        {% for t in tags %}
+          {% if t[0] != tag %}
+            <li>
+              <a class="tag" href="{{ root_path }}?tag={{ url_escape(t[0]) }}">{{ t[0] }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+  <ul class="posts__entries">
+  {% for post in posts %}
+    <li>
+      <a href="{{ root_path }}/{{ post.slug }}">{{ post.title }}</a>
+      <span>
+        {% for t in post.tags %}
+          <a class="tag" href="{{ root_path }}?tag={{ url_escape(t) }}">{{ t }}</a>
+        {% endfor %}
+        <time datetime="{{ post.published_at }}" data-short="true">{{ post.published_at }}</time>
+      </span>
+    </li>
+  {% endfor %}
+  </ul>
+{% endmacro %}

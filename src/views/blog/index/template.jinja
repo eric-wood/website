@@ -2,53 +2,15 @@
 {% set active_page = 'blog' %}
 {% block title %}Blog{% endblock %}
 {% block head %}
-  {{ inline_style("src/views/blog/shared.css") }}
   {{ inline_style("src/views/blog/index/style.css") }}
+  {{ inline_style("src/styles/posts.css") }}
 {% endblock %}
+{% import "posts" as posts_macro %}
 
 {% block body %}
-<div class="blog__layout">
-  <h2 class="blog__title">
-    → Blog
-    {% if tag %}
-      / {{ tag }}
-    {% endif %}
-  </h2>
-  <div class="blog__tags">
-    <span class="blog__tags-title">Categories</span>
-    <ul class="blog__tag-list">
-      {% if tag %}
-        <li>
-          <a href="/blog" class="tag active">
-            {{ tag }}
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <use xlink:href="#close-icon" />
-            </svg>
-          </a>
-        </li>
-      {% endif %}
-      {% for t in tags %}
-        {% if t[0] != tag %}
-          <li>
-            <a class="tag" href="/blog?tag={{ url_escape(t[0]) }}">{{ t[0] }}</a>
-          </li>
-        {% endif %}
-      {% endfor %}
-    </ul>
-  </div>
-  <ul class="blog__entries">
-  {% for post in posts %}
-    <li>
-      <a href="/blog/{{ post.slug }}">{{ post.title }}</a>
-      <span>
-        {% for t in post.tags %}
-          <a class="tag" href="/blog?tag={{ url_escape(t) }}">{{ t }}</a>
-        {% endfor %}
-        <time datetime="{{ post.published_at }}" data-short="true">{{ post.published_at }}</time>
-      </span>
-    </li>
-  {% endfor %}
-  </ul>
+<div class="layout">
+  {{ posts_macro.header("Blog", tag=tag) }}
+  {{ posts_macro.table(posts, root_path="/blog", tag=tag) }}
 </div>
 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: none">
   <defs>
