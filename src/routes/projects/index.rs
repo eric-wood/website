@@ -1,6 +1,6 @@
 use crate::{
     AppState, Response,
-    views::{View, blog::BlogIndex},
+    views::{View, projects::ProjectsIndex},
 };
 use axum::{
     extract::{Query, State},
@@ -22,7 +22,7 @@ pub async fn index(query: Query<IndexParams>, State(state): State<Arc<AppState>>
     };
 
     let tags = state.project_store.all_tags();
-    let view = BlogIndex::new(posts, tags, query.tag.clone());
+    let view = ProjectsIndex::new(posts, tags, query.tag.clone());
     let html = view.render(&state.reloader)?;
 
     Ok(Html(html))
