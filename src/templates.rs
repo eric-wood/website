@@ -15,7 +15,7 @@ struct NavLink<'a> {
 
 pub fn load_templates_dyn(config: &Config) -> AutoReloader {
     let should_autoreload = config.auto_reload_templates;
-    let blog_posts_path_str = config.blog_posts_path.clone();
+    let content_path_str = config.content_path.clone();
     let is_prod = config.is_prod();
 
     AutoReloader::new(move |notifier| {
@@ -32,8 +32,8 @@ pub fn load_templates_dyn(config: &Config) -> AutoReloader {
             let views_path = Path::new("src/views");
             notifier.watch_path(views_path, true);
 
-            let blog_posts_path = Path::new(&blog_posts_path_str);
-            notifier.watch_path(blog_posts_path, true);
+            let content_path = Path::new(&content_path_str);
+            notifier.watch_path(content_path, true);
         }
         env.add_function("url_escape", url_escape);
         env.add_function("inline_style", inline_style);

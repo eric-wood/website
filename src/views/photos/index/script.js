@@ -7,12 +7,14 @@ const photos = Array.from(document.querySelectorAll(".photos > *")).map(
       id: photo.id,
       aspectRatio: width / height,
       element: photo,
+      shown: true,
     };
   }
 );
 
 const MAX_HEIGHT = parseFloat(getComputedStyle(photos[0].element).maxHeight.replace('px', ''))
 const container = document.querySelector(".photos");
+const maxRows = container.dataset.rows;
 const gap = parseFloat(getComputedStyle(container).gap.replace('px', ''));
 
 const recalculateHeights = () => {
@@ -30,6 +32,12 @@ const recalculateHeights = () => {
   const grid = [newRow()];
   let currentRow = 0;
   photos.forEach((photo) => {
+    if (maxRows && currentRow >= maxRows) {
+      photo.shown = false
+      return;
+    }
+
+    photo.shown = true;
     const row = grid[currentRow];
     const aspectRatio = row.aspectRatio + photo.aspectRatio;
     row.aspectRatio = aspectRatio;
@@ -51,10 +59,14 @@ const recalculateHeights = () => {
     });
   });
 
-  photos.forEach(({ element, width, height }) => {
-    element.style.height = `${height}px`;
-    element.style.maxWidth = `${width}px`;
-    element.style.display = 'initial';
+  photos.forEach(({ element, width, height, shown }) => {
+    if (shown) {
+      element.style.height = `${height}px`;
+      element.style.maxWidth = `${width}px`;
+      element.style.display = 'initial';
+    } else {
+      element.style.display = 'none';
+    }
   });
 };
 

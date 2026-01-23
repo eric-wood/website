@@ -1,0 +1,50 @@
+{% extends "layout" %}
+{% block title %}Eric, online{% endblock %}
+{% block head %}
+  {{ inline_style("src/styles/posts.css") }}
+  {{ inline_style("src/views/home/index/style.css") }}
+  {{ inline_style("src/views/photos/index/style.css") }}
+{% endblock %}
+{% import "posts" as posts_macro %}
+
+{% block body %}
+  <div class="layout">
+    <h2>Hello!</h2>
+    <p>my name is <b>Eric Wood</b> and this is my website</p>
+    <p>I am an engineer in <b>Golden, Colorado</b></p>
+    <p>this website contains things I love</p>
+    <section class="summary">
+      {{ posts_macro.table(blog_posts, root_path="/blog", title="Recent blog posts", show_tags=false) }}
+      <a href="/blog">See all →</a>
+    </section>
+    <section class="summary">
+      {{ posts_macro.table(projects, root_path="/projects", title="Recent projects", show_tags=false) }}
+      <a href="/projects">See all →</a>
+    </section>
+    <section class="summary">
+      <div class="posts__heading">
+        <span class="posts__heading-title">Recent photos</span>
+      </div>
+      <div class="photos" data-rows="2">
+        {% for photo in photos %}
+          <a
+            href="/photos/{{ photo.id }}"
+            id="{{ photo.id }}"
+            data-width="{{ photo.width }}"
+            data-height="{{ photo.height }}"
+            style="aspect-ratio: {{ photo.width / photo.height }}"
+          >
+            <img
+            {% if loop.index < 6 %}
+              fetchpriority="high"
+            {% endif %}
+              src="{{ photo_thumbnail_url(photo.id) }}"
+            >
+          </a>
+        {% endfor %}
+      </div>
+      <a href="/photos">See all →</a>
+    </section>
+  </div>
+  {{ inline_script("src/views/photos/index/script.js") }}
+{% endblock %}

@@ -110,7 +110,8 @@ async fn main() -> anyhow::Result<()> {
         .route("/blog", get(routes::blog::index))
         .route("/blog/{slug}", get(routes::blog::show))
         .route("/projects", get(routes::projects::index))
-        .route("/projects/{slug}", get(routes::projects::show));
+        .route("/projects/{slug}", get(routes::projects::show))
+        .route("/", get(routes::home::index));
 
     let app_state = Arc::new(AppState {
         config,

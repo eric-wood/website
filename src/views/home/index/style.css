@@ -1,0 +1,16 @@
+.summary {
+  margin-bottom: 30px;
+}
+
+.summary a {
+  color: var(--foreground);
+}
+
+.summary .photos {
+  margin: 16px 0;
+  gap: 16px;
+}
+
+.summary .photos > * {
+  max-height: 300px;
+}

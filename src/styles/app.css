@@ -42,14 +42,24 @@ header {
   border-bottom: solid var(--foreground) 3px;
 }
 
-header h1 {
+header .home {
   color: var(--foreground);
   text-transform: uppercase;
+  margin: 0;
+  padding: 10px 30px;
+  letter-spacing: 3px;
+  border-right: solid var(--foreground) 3px;
+  text-decoration: none;
+}
+
+header .home h1 {
   font-weight: 900;
   margin: 0;
-  letter-spacing: 3px;
-  padding: 10px 30px;
-  border-right: solid var(--foreground) 3px;
+}
+
+header .home:hover {
+  color: var(--background);
+  background-color: var(--foreground);
 }
 
 header nav ul {
