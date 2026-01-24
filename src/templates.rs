@@ -4,7 +4,7 @@ use minijinja_autoreload::AutoReloader;
 use serde::Serialize;
 use std::{fs::read_to_string, path::Path};
 
-use crate::config::Config;
+use crate::{config::Config, date_time::DateTime};
 
 #[derive(Serialize)]
 struct NavLink<'a> {
@@ -42,6 +42,7 @@ pub fn load_templates_dyn(config: &Config) -> AutoReloader {
         env.add_function("photo_url", photo_url);
         env.add_function("assets_path", assets_path);
         env.add_function("year", year);
+        env.add_function("timestamp", timestamp);
         env.add_global(
             "nav_links",
             Value::from_serialize([
@@ -138,4 +139,10 @@ fn assets_path(path: String) -> String {
 fn year() -> String {
     let year = chrono::Utc::now().year();
     format!("{year}")
+}
+
+fn timestamp() -> String {
+    let now = DateTime::now();
+    let time_str: String = now.into();
+    format!("<time datetime=\"{time_str}\" data-time=\"true\">{time_str}</time>")
 }

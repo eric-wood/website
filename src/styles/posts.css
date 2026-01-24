@@ -76,3 +76,10 @@
   border: solid var(--foreground) 2px;
   background-color: var(--background);
 }
+
+@media (max-width: 850px) {
+  .posts__entries li {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

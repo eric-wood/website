@@ -89,8 +89,20 @@ header nav ul a.active, header nav ul a:hover {
     flex-direction: column;
   }
 
+  header .home {
+    padding: 10px 20px;
+  }
+
   header nav ul {
     flex-direction: column;
+  }
+
+  header nav ul a {
+    padding: 10px 20px;
+  }
+
+  .layout {
+    padding: 20px;
   }
 }
 

@@ -11,6 +11,10 @@ use serde::{
 pub struct DateTime(chrono::DateTime<FixedOffset>);
 
 impl DateTime {
+    pub fn now() -> Self {
+        Self(chrono::Utc::now().fixed_offset())
+    }
+
     pub fn min_date() -> Self {
         Self(chrono::DateTime::<FixedOffset>::MIN_UTC.fixed_offset())
     }

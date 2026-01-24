@@ -110,3 +110,9 @@
   opacity: 0.75;
 }
 
+@media (max-width: 850px) {
+  .blog__title {
+    margin-top: 0;
+    font-size: 22pt;
+  }
+}

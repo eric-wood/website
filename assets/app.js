@@ -1,7 +1,7 @@
 const longFormatter = new Intl.DateTimeFormat(undefined, {
   month: "short",
   day: "numeric",
-  year: "numeric"
+  year: "numeric",
 });
 
 const shortFormatter = new Intl.DateTimeFormat(undefined, {
@@ -10,12 +10,20 @@ const shortFormatter = new Intl.DateTimeFormat(undefined, {
   year: "2-digit",
 });
 
+const timeFormatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: "medium",
+  timeStyle: "medium",
+});
+
 const initTimestamps = () => {
   document.querySelectorAll('time').forEach((el) => {
     let formatter = longFormatter
     const isShort = el.dataset.short === "true";
+    const hasTime = el.dataset.time === "true";
     if (isShort) {
       formatter = shortFormatter;
+    } else if (hasTime) {
+      formatter = timeFormatter;
     }
 
     const timeStr = el.attributes.datetime;
