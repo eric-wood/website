@@ -46,6 +46,8 @@ pub fn bootstrap_cache(config: &Config) -> anyhow::Result<()> {
     Ok(())
 }
 
+static ONE_YEAR: usize = 525600;
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let _ = dotenv();
@@ -81,37 +83,40 @@ async fn main() -> anyhow::Result<()> {
         .nest_service(
             "/photos/assets",
             ServiceBuilder::new()
-                .layer(SetResponseHeaderLayer::overriding(
-                    header::CACHE_CONTROL,
-                    HeaderValue::from_static("public, max-age=31536000, immutible"),
-                ))
+                .layer(cache(ONE_YEAR))
                 .service(ServeDir::new(&config.assets_path)),
         )
         .nest_service(
             "/photos/thumbnails",
             ServiceBuilder::new()
-                .layer(SetResponseHeaderLayer::overriding(
-                    header::CACHE_CONTROL,
-                    HeaderValue::from_static("public, max-age=31536000, immutible"),
-                ))
+                .layer(cache(ONE_YEAR))
                 .service(ServeDir::new(&config.photos_thumbnail_path)),
         )
         .nest_service(
             "/photos/images",
             ServiceBuilder::new()
-                .layer(SetResponseHeaderLayer::overriding(
-                    header::CACHE_CONTROL,
-                    HeaderValue::from_static("public, max-age=31536000, immutible"),
-                ))
+                .layer(cache(ONE_YEAR))
                 .service(ServeDir::new(&config.photos_image_path)),
         )
-        .route("/photos", get(routes::photos::index))
-        .route("/photos/{id}", get(routes::photos::show))
-        .route("/blog", get(routes::blog::index))
-        .route("/blog/{slug}", get(routes::blog::show))
-        .route("/projects", get(routes::projects::index))
-        .route("/projects/{slug}", get(routes::projects::show))
-        .route("/", get(routes::home::index));
+        .route("/photos", get(routes::photos::index).route_layer(cache(10)))
+        .route(
+            "/photos/{id}",
+            get(routes::photos::show).route_layer(cache(10)),
+        )
+        .route("/blog", get(routes::blog::index).route_layer(cache(10)))
+        .route(
+            "/blog/{slug}",
+            get(routes::blog::show).route_layer(cache(10)),
+        )
+        .route(
+            "/projects",
+            get(routes::projects::index).route_layer(cache(10)),
+        )
+        .route(
+            "/projects/{slug}",
+            get(routes::projects::show).route_layer(cache(10)),
+        )
+        .route("/", get(routes::home::index).route_layer(cache(10)));
 
     let app_state = Arc::new(AppState {
         config,
@@ -133,6 +138,15 @@ async fn main() -> anyhow::Result<()> {
     axum::serve(listener, app).await?;
 
     Ok(())
+}
+
+fn cache(minutes: usize) -> SetResponseHeaderLayer<HeaderValue> {
+    let age = minutes * 60;
+    let header = format!("public, max-age={age}, immutible");
+    SetResponseHeaderLayer::overriding(
+        header::CACHE_CONTROL,
+        HeaderValue::from_str(&header).unwrap_or_else(|_| panic!("invalid header: {header}")),
+    )
 }
 
 async fn handler_404() -> anyhow::Result<Html<String>, app_error::AppError> {
