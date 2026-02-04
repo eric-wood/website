@@ -24,7 +24,15 @@ impl convert::TryFrom<String> for DateTime {
     type Error = ParseError;
 
     fn try_from(value: String) -> Result<Self, ParseError> {
-        let dt = chrono::DateTime::parse_from_rfc3339(&value)?;
+        // attempt parsing a few formats
+        let dt = chrono::DateTime::parse_from_rfc3339(&value).or_else(|_| {
+            Ok(
+                chrono::NaiveDateTime::parse_from_str(&value, "%m/%d/%y %H:%M")?
+                    .and_local_timezone(chrono_tz::US::Mountain)
+                    .unwrap()
+                    .fixed_offset(),
+            )
+        })?;
         Ok(DateTime(dt))
     }
 }
@@ -47,15 +55,15 @@ impl<'de> Visitor<'de> for DateTimeVisitor {
     type Value = DateTime;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        formatter.write_str("an ISO 8601 string")
+        formatter.write_str("an ISO 8601 string, or one in the format m/d/y \"h:m\"")
     }
 
     fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
     where
         E: de::Error,
     {
-        match chrono::DateTime::parse_from_rfc3339(value) {
-            Ok(dt) => Ok(DateTime(dt)),
+        match DateTime::try_from(value.to_string()) {
+            Ok(dt) => Ok(dt),
             Err(_) => Err(E::custom(format!("unable to parse DateTime: {value}"))),
         }
     }
