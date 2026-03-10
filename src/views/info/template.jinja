@@ -1,0 +1,18 @@
+{% extends "layout" %}
+{% set meta_description = "How's my server doing?" %}
+{% block title %}Server Info{% endblock %}
+{% block head %}
+{% endblock %}
+{% block body %}
+<div class="layout">
+  <h2 class="page-title">→ Server info</h2>
+  <ul>
+    <li><b>Computer</b>: {{ computer }}</li>
+    <li><b>Processor</b>: {{ processor }}</li>
+    <li><b>Memory</b>: {{ memory }}GB</li>
+    <li><b>Uptime</b>: {{ uptime }}</li>
+  </ul>
+  <p><i>Be nice, it's just a lil guy<i></p>
+  <img src="{{ assets_path("computer.jpeg") }}">
+</div>
+{% endblock %}

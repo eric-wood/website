@@ -83,6 +83,25 @@
   white-space: break-spaces;
 }
 
+.blog__body .youtube {
+  width: 100%;
+  aspect-ratio: 560 / 315;
+}
+
+.blog__body img {
+  width: 100%;
+  max-width: 100%;
+}
+
+.blog__body figure {
+  margin: 16px 0;
+}
+
+.blog__body figcaption {
+  font-style: italic;
+  font-size: 10pt;
+}
+
 .blog__section {
   scroll-margin-top: 20px;
 }

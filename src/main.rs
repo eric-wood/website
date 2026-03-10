@@ -98,6 +98,12 @@ async fn main() -> anyhow::Result<()> {
                 .layer(cache(ONE_YEAR))
                 .service(ServeDir::new(&config.photos_image_path)),
         )
+        .nest_service(
+            "/assets",
+            ServiceBuilder::new()
+                .layer(cache(ONE_YEAR))
+                .service(ServeDir::new(&config.content_assets_path)),
+        )
         .route("/photos", get(routes::photos::index).route_layer(cache(10)))
         .route(
             "/photos/{id}",
@@ -116,6 +122,8 @@ async fn main() -> anyhow::Result<()> {
             "/projects/{slug}",
             get(routes::projects::show).route_layer(cache(10)),
         )
+        .route("/info", get(routes::info::info))
+        .route_layer(cache(1))
         .route("/", get(routes::home::index).route_layer(cache(10)));
 
     let app_state = Arc::new(AppState {

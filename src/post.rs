@@ -367,7 +367,10 @@ pub fn render_post(path: &PathBuf) -> anyhow::Result<(String, Vec<Section>)> {
             .maybe_front_matter_delimiter(Some("---".to_string()))
             .build(),
         parse: options::Parse::builder().build(),
-        render: options::Render::builder().build(),
+        render: options::Render::builder()
+            .r#unsafe(true)
+            .figure_with_caption(true)
+            .build(),
     };
     let arena = Arena::new();
     let root = parse_document(&arena, &md, &options);

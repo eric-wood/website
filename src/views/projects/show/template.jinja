@@ -13,7 +13,7 @@
     <div class="blog__header">
       <h1 class="blog__title">{{ post.title }}</h1>
       <div>
-        <span class="post__tags-title">Posted</span>
+        <span class="post__tags-title">Completed</span>
         <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
       </div>
       <div class="blog__tags">
@@ -34,4 +34,5 @@
       </div>
     </div>
   </div>
+  {{ inline_script("src/views/blog/show/script.js") }}
 {% endblock %}

@@ -13,6 +13,7 @@ pub struct Config {
     pub content_path: String,
     pub blog_posts_path: String,
     pub projects_path: String,
+    pub content_assets_path: String,
     pub photos_db_path: String,
     pub photos_thumbnail_path: String,
     pub photos_image_path: String,
@@ -38,6 +39,7 @@ impl Config {
         let content_folder_path = Path::new(&content_path);
         let blog_posts_path = content_folder_path.join("blog_posts").display().to_string();
         let projects_path = content_folder_path.join("projects").display().to_string();
+        let content_assets_path = content_folder_path.join("assets").display().to_string();
 
         let photos_db_path =
             env::var("PHOTOS_DB_PATH").expect("PHOTOS_DB_PATH env variable not set");
@@ -54,6 +56,7 @@ impl Config {
             content_path,
             blog_posts_path,
             projects_path,
+            content_assets_path,
             photos_db_path,
             photos_thumbnail_path,
             photos_image_path,
