@@ -2,7 +2,7 @@
   --foreground: black;
   --background: white;
   --half: color-mix(in srgb, var(--foreground) 50%, transparent);
-  --light: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --light: color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 
 * {
@@ -23,6 +23,10 @@ body {
   flex-direction: column;
   align-items: center;
   height: 100%;
+}
+
+a {
+  color: var(--foreground);
 }
 
 .container {
@@ -122,5 +126,48 @@ header nav ul a.active, header nav ul a:hover {
 footer {
   margin-top: 30px;
   padding: 30px;
+}
+
+.footer__links {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+
+.footer__links > * {
+  flex-grow: 1
+}
+
+.footer__links h4 {
+  margin: 0;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  font-size: 10pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-bottom: solid var(--foreground) 2px;
+}
+
+.footer__links ul {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.footer__links a {
+  text-decoration: none;
+}
+
+.footer__links a:hover {
+  text-decoration: underline;
+}
+
+.footer__subtext {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10pt;
   color: var(--half);
 }

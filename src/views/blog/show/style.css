@@ -8,11 +8,6 @@
   border-bottom: solid var(--foreground) 2px;
 }
 
-.blog__title {
-  font-size: 26pt;
-  margin: 30px 0;
-}
-
 .blog__tags {
   display: flex;
   align-items: center;
@@ -130,7 +125,7 @@
 }
 
 @media (max-width: 850px) {
-  .blog__title {
+  .page-title {
     margin-top: 0;
     font-size: 22pt;
   }

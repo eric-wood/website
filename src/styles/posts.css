@@ -61,6 +61,10 @@
   gap: 5px;
 }
 
+a.tag:hover {
+  background-color: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
 .tag svg {
   width: 12px;
   height: 12px;

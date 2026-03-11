@@ -53,8 +53,37 @@
         {% block body %}{% endblock %}
       </div>
       <footer>
-        © Eric Wood {{ year() }}
-        <div>Rendered {{ timestamp() }}</div>
+        <div class="footer__links">
+          <div>
+            <h4>Site</h4>
+            <ul>
+              {% for link in nav_links %}
+                <li>
+                  <a href="{{ link.href }}">{{ link.label }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div>
+            <h4>Links</h4>
+            <ul>
+              <li><a href="https://github.com/eric-wood">Github</a></li>
+              <li><a href="https://bsky.app/profile/ericwood.org">BlueSky</a></li>
+              <li><a href="https://www.linkedin.com/in/ericwoodtx/">LinkedIn</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Meta</h4>
+            <ul>
+              <li><a href="https://github.com/eric-wood/website">View source</a></li>
+              <li><a href="/info">Server info</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer__subtext">
+          <div>© Eric Wood {{ year() }}</div>
+          <div>Rendered {{ timestamp() }}</div>
+        </div>
       </footer>
     </div>
 

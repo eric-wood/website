@@ -122,8 +122,7 @@ async fn main() -> anyhow::Result<()> {
             "/projects/{slug}",
             get(routes::projects::show).route_layer(cache(10)),
         )
-        .route("/info", get(routes::info::info))
-        .route_layer(cache(1))
+        .route("/info", get(routes::info::info).route_layer(cache(1)))
         .route("/", get(routes::home::index).route_layer(cache(10)));
 
     let app_state = Arc::new(AppState {
