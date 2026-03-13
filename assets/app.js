@@ -1,3 +1,26 @@
+const colorschemes = {
+  red: {
+    foreground: "firebrick",
+    background: "whitesmoke",
+  },
+  green: {
+    foreground: "lightgreen",
+    background: "darkslategray",
+  },
+  pink: {
+    foreground: "pink",
+    background: "rebeccapurple",
+  },
+  blue: {
+    foreground: "midnightblue",
+    background: "aliceblue",
+  },
+  brown: {
+    foreground: "maroon",
+    background: "oldlace",
+  }
+}
+
 const longFormatter = new Intl.DateTimeFormat(undefined, {
   month: "short",
   day: "numeric",
@@ -38,6 +61,36 @@ const initTimestamps = () => {
   })
 };
 
+const initTheme = () => {
+  const themeCookie = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("theme="));
+
+  let theme = "black";
+  if (themeCookie) {
+    theme = themeCookie.split("=")[1];
+  }
+
+  console.log(theme)
+  const swatch = document.querySelector(`.theme-swatch[data-foreground="${theme}"]`);
+  if (swatch) {
+    setTheme(swatch);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initTimestamps();
+  initTheme();
 });
+
+window.setTheme = (el) => {
+  document.querySelector(".theme-swatch.selected")?.classList.remove("selected");
+  el.classList.add("selected");
+
+  const foreground = el.dataset.foreground;
+  const background = el.dataset.background;
+  document.body.style.setProperty("--foreground", foreground);
+  document.body.style.setProperty("--background", background);
+
+  document.cookie = `theme=${foreground}`;
+}

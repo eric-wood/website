@@ -171,3 +171,21 @@ footer {
   font-size: 10pt;
   color: var(--half);
 }
+
+.theme-swatches {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-swatch {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  border: none;
+}
+
+.theme-swatch.selected {
+  outline: solid var(--foreground) 2px;
+  outline-offset: 2px;
+}

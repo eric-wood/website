@@ -1,3 +1,10 @@
+{% set themes = [
+  ("black", "white"),
+  ("firebrick", "whitesmoke"),
+  ("lightgreen", "darkslategray"),
+  ("pink", "rebeccapurple"),
+  ("midnightblue", "aliceblue"),
+] %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -75,6 +82,22 @@
           <div>
             <h4>Meta</h4>
             <ul>
+              <li>
+                <div class="theme-swatches">
+                  Theme
+                  {% for theme in themes %}
+                    <button
+                      type="button"
+                      class="theme-swatch"
+                      data-foreground="{{ theme[0] }}"
+                      data-background="{{ theme[1] }}"
+                      style="background-color: {{ theme[0] }}"
+                      onclick="setTheme(this)"
+                    >
+                    </button>
+                  {% endfor %}
+                </div>
+              </li>
               <li><a href="https://github.com/eric-wood/website">View source</a></li>
               <li><a href="/info">Server info</a></li>
             </ul>
