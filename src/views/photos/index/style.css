@@ -83,6 +83,7 @@
   padding: 0;
   width: 30px;
   height: 30px;
+  color: var(--foreground);
 }
 
 .photos__nav .close svg {
@@ -144,6 +145,7 @@
   background: none;
   appearance: none;
   font-size: 14pt;
+  color: var(--foreground);
 }
 
 .photos__mobile-nav .sort {
