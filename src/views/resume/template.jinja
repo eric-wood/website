@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180"    href="{{ assets_path("apple-touch-icon.png") }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ assets_path("favicon-32x32.png") }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ assets_path("favicon-16x16.png") }}">
+    <link rel="manifest" href="{{ assets_path("site.webmanifest") }}">
+    <link rel="stylesheet" href="{{ assets_path("fonts/inter/inter.css") }}">
+    <style type="text/css">
+      :root { font-family: 'Inter', serif; }
+        @supports (font-variation-settings: normal) {
+          :root { font-family: 'InterVariable', serif; }
+        }
+    </style>
+    <title>Eric Wood - Resume</title>
+    {{ inline_style("src/views/resume/style.css") }}
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Eric Wood</h1>
+        <div>
+          <div>{{ resume.location }}</div>
+          <div>
+            <a href="mailto:{{ resume.email }}">{{ resume.email }}</a>
+          </div>
+        </div>
+      </header>
+      {% for section in resume.sections %}
+        <section>
+          <h2>{{ section.title }}</h2>
+          <ul>
+          {% for subsection in section.contents %}
+            <li>
+              <div class="heading">
+                <h3>{{ subsection.title }}</h3>
+                {% if subsection.subtitle %}
+                  –
+                  <h4>{{ subsection.subtitle }}</h4>
+                {% endif %}
+              </div>
+              {% if subsection.timeframe %}
+                <div class="timeframe">{{ subsection.timeframe }}</div>
+              {% endif %}
+              {% if subsection.contents is string %}
+                <p>{{ subsection.contents }}</p>
+              {% else %}
+                <ul>
+                  {% for item in subsection.contents %}
+                    <li>{{ item }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+          </ul>
+        </section>
+      {% endfor %}
+    </main>
+  </body>
+</html>

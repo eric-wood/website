@@ -124,6 +124,10 @@ async fn main() -> anyhow::Result<()> {
         )
         .route("/music", get(routes::music::index).route_layer(cache(10)))
         .route("/info", get(routes::info::info).route_layer(cache(1)))
+        .route(
+            "/resume",
+            get(routes::resume::resume).route_layer(cache(10)),
+        )
         .route("/", get(routes::home::index).route_layer(cache(10)));
 
     let app_state = Arc::new(AppState {

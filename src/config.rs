@@ -11,6 +11,7 @@ pub struct Config {
     pub cache_path: String,
     pub auto_reload_templates: bool,
     pub content_path: String,
+    pub resume_path: String,
     pub blog_posts_path: String,
     pub projects_path: String,
     pub content_assets_path: String,
@@ -37,6 +38,10 @@ impl Config {
 
         let content_path = env::var("CONTENT_PATH").expect("CONTENT_PATH env variable not set");
         let content_folder_path = Path::new(&content_path);
+        let resume_path = content_folder_path
+            .join("resume.yaml")
+            .display()
+            .to_string();
         let blog_posts_path = content_folder_path.join("blog_posts").display().to_string();
         let projects_path = content_folder_path.join("projects").display().to_string();
         let content_assets_path = content_folder_path.join("assets").display().to_string();
@@ -54,6 +59,7 @@ impl Config {
             cache_path,
             auto_reload_templates,
             content_path,
+            resume_path,
             blog_posts_path,
             projects_path,
             content_assets_path,

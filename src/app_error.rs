@@ -23,6 +23,9 @@ pub enum AppError {
     TemplateError(#[from] minijinja::Error),
 
     #[error(transparent)]
+    YamlError(#[from] serde_yaml::Error),
+
+    #[error(transparent)]
     Anyhow(#[from] anyhow::Error),
 }
 
@@ -31,9 +34,11 @@ impl AppError {
         match self {
             Self::NotFound => StatusCode::NOT_FOUND,
             Self::ValidationError(_) => StatusCode::BAD_REQUEST,
-            Self::DbError(_) | Self::Anyhow(_) | Self::IoError(_) | Self::TemplateError(_) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
+            Self::DbError(_)
+            | Self::Anyhow(_)
+            | Self::IoError(_)
+            | Self::TemplateError(_)
+            | Self::YamlError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }

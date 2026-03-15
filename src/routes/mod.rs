@@ -4,3 +4,4 @@ pub mod info;
 pub mod music;
 pub mod photos;
 pub mod projects;
+pub mod resume;
