@@ -47,6 +47,16 @@ pub fn load_templates_dyn(config: &Config) -> AutoReloader {
             "nav_links",
             Value::from_serialize([
                 NavLink {
+                    id: "projects",
+                    label: "Projects",
+                    href: "/projects",
+                },
+                NavLink {
+                    id: "blog",
+                    label: "Blog",
+                    href: "/blog",
+                },
+                NavLink {
                     id: "photos",
                     label: "Photos",
                     href: "/photos",
@@ -55,16 +65,6 @@ pub fn load_templates_dyn(config: &Config) -> AutoReloader {
                     id: "music",
                     label: "Music",
                     href: "/music",
-                },
-                NavLink {
-                    id: "blog",
-                    label: "Blog",
-                    href: "/blog",
-                },
-                NavLink {
-                    id: "projects",
-                    label: "Projects",
-                    href: "/projects",
                 },
             ]),
         );

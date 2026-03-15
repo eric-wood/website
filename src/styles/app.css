@@ -57,6 +57,7 @@ header .title-container button {
   border: none;
   background: none;
   padding: 0 20px;
+  color: var(--foreground);
 }
 
 header .title-container button svg {

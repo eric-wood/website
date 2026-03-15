@@ -9,10 +9,13 @@
 
 {% block body %}
   <div class="layout">
-    <h2 class="page-title">→ Hello</h2>
-    <p>my name is <b>Eric Wood</b> and this is my website</p>
-    <p>I am an engineer in <b>Golden, Colorado</b></p>
-    <p>this website contains things I love</p>
+    <section>
+      <h2 class="page-title">→ Hello</h2>
+      <p>My name is <b>Eric Wood</b> and this is my website</p>
+      <p>I am an engineer living in <b>Golden, Colorado</b></p>
+      <p>I design and build audio electronics as <b><a href="https://heuristic.industries">Heuristic Industries</a></b></p>
+      <p>This website runs on a <a href="/info">little server</a> in my closet</p>
+    </section>
     <section class="summary">
       {{ posts_macro.table(blog_posts, root_path="/blog", title="Recent blog posts", show_tags=false) }}
       <a href="/blog">See all →</a>
