@@ -17,19 +17,19 @@ const initToc = () => {
 
 
 
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      const id = entry.target.id;
-      intersections[id].classList.toggle("active", entry.isIntersecting);
-    });
-  },
-    {
-      rootMargin: "-30% 0px -60% 0px",
-    });
+  //observer = new IntersectionObserver((entries) => {
+  //  entries.forEach((entry) => {
+  //    const id = entry.target.id;
+  //    intersections[id].classList.toggle("active", entry.isIntersecting);
+  //  });
+  //},
+  //  {
+  //    rootMargin: "-30% 0px -60% 0px",
+  //  });
 
-  document.querySelectorAll(".blog__section").forEach((el) => {
-    observer.observe(el);
-  });
+  //document.querySelectorAll(".blog__section").forEach((el) => {
+  //  observer.observe(el);
+  //});
 };
 
 document.addEventListener("DOMContentLoaded", () => {

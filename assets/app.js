@@ -61,14 +61,11 @@ const initTimestamps = () => {
 };
 
 const initTheme = () => {
-  const themeCookie = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("theme="));
-
-  let theme = "black";
-  if (themeCookie) {
-    theme = themeCookie.split("=")[1];
+  let theme = localStorage.getItem("theme");
+  if (!theme) {
+    theme = "black";
   }
+
 
   const swatch = document.querySelector(`.theme-swatch[data-foreground="${theme}"]`);
   if (swatch) {
@@ -90,7 +87,7 @@ window.setTheme = (el) => {
   document.documentElement.style.setProperty("--foreground", foreground);
   document.documentElement.style.setProperty("--background", background);
 
-  document.cookie = `theme=${foreground}`;
+  localStorage.setItem("theme", foreground);
 }
 
 window.toggleMenu = () => {
