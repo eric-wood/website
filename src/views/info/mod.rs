@@ -24,11 +24,14 @@ impl Info {
 
     fn processor(&self) -> String {
         let cpu = self.sys.cpus().first().unwrap();
-        let cpu_brand = cpu.brand();
-        let cpu_name = cpu.name();
-        let cpu_frequency = format!("{:.1}GHz", cpu.frequency() as f64 / 1000.0);
+        let cpu_brand = cpu
+            .brand()
+            .replace("(R)", "®")
+            .replace("(TM)", "™")
+            .replace("CPU", "");
+        let cpu_name = cpu.name().replace("1", "").replace("cpu0", "");
         let cores = sysinfo::System::physical_core_count().unwrap();
-        format!("{cpu_brand} {cpu_name} {cpu_frequency} {cores} cores")
+        format!("{cpu_brand} {cpu_name} ({cores} cores)")
     }
 
     fn computer(&self) -> String {
