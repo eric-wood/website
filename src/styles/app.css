@@ -46,7 +46,26 @@ header {
   border-bottom: solid var(--foreground) 3px;
 }
 
+header .title-container {
+  display: flex;
+}
+
+header .title-container button {
+  display: none;
+  align-items: center;
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0 20px;
+}
+
+header .title-container button svg {
+  height: 30px;
+}
+
 header .home {
+  display: block;
+  flex-grow: 1;
   color: var(--foreground);
   text-transform: uppercase;
   margin: 0;
@@ -94,8 +113,17 @@ header nav ul a.active, header nav ul a:hover {
     flex-direction: column;
   }
 
+  header .title-container button {
+    display: flex;
+  }
+
   header .home {
     padding: 10px 20px;
+    border: none;
+  }
+
+  header nav.hidden {
+    display: none;
   }
 
   header nav ul {
@@ -107,7 +135,7 @@ header nav ul a.active, header nav ul a:hover {
   }
 
   .layout {
-    padding: 20px;
+    padding: 0 20px;
   }
 }
 
@@ -188,4 +216,20 @@ footer {
 .theme-swatch.selected {
   outline: solid var(--foreground) 2px;
   outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  footer {
+    padding: 20px;
+    margin-top: 0;
+  }
+
+  .footer__links {
+    flex-direction: column;
+  }
+
+  .footer__subtext {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

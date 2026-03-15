@@ -49,8 +49,7 @@ const initTimestamps = () => {
       formatter = timeFormatter;
     }
 
-    const timeStr = el.attributes.datetime;
-    if (!timeStr || !timeStr.value) {
+    const timeStr = el.attributes.datetime; if (!timeStr || !timeStr.value) {
       return;
     }
 
@@ -71,7 +70,6 @@ const initTheme = () => {
     theme = themeCookie.split("=")[1];
   }
 
-  console.log(theme)
   const swatch = document.querySelector(`.theme-swatch[data-foreground="${theme}"]`);
   if (swatch) {
     setTheme(swatch);
@@ -89,8 +87,12 @@ window.setTheme = (el) => {
 
   const foreground = el.dataset.foreground;
   const background = el.dataset.background;
-  document.body.style.setProperty("--foreground", foreground);
-  document.body.style.setProperty("--background", background);
+  document.documentElement.style.setProperty("--foreground", foreground);
+  document.documentElement.style.setProperty("--background", background);
 
   document.cookie = `theme=${foreground}`;
+}
+
+window.toggleMenu = () => {
+  document.querySelector("header nav").classList.toggle("hidden");
 }

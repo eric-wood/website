@@ -61,6 +61,11 @@
   width: 100%;
 }
 
+.blog__body p {
+  text-wrap: pretty;
+  line-height: 1.4;
+}
+
 .blog__body pre {
   padding: 20px;
   border-radius: 6px;

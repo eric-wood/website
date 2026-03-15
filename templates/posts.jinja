@@ -41,7 +41,7 @@
   {% for post in posts %}
     <li>
       <a href="{{ root_path }}/{{ post.slug }}">{{ post.title }}</a>
-      <span>
+      <span class="posts__tags">
         {% for t in post.tags %}
           <a class="tag" href="{{ root_path }}?tag={{ url_escape(t) }}">{{ t }}</a>
         {% endfor %}

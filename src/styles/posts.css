@@ -14,6 +14,7 @@
 
 .posts__tag-list {
   display: flex;
+  flex-wrap: wrap;
   gap: 5px;
   margin: 0;
   padding: 0;
@@ -43,6 +44,13 @@
 
 .posts__entries li > a:hover {
   text-decoration: underline;
+}
+
+.posts__tags {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .posts__entries li time {
@@ -77,6 +85,11 @@ a.tag:hover {
 }
 
 @media (max-width: 850px) {
+  .posts__heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .posts__entries li {
     flex-direction: column;
     gap: 10px;

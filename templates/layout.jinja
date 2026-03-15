@@ -38,10 +38,15 @@
     <div class="container">
       <div>
         <header>
-          <a href="/" class="home">
-            <h1>Eric Wood</h1>
-          </a>
-          <nav>
+          <div class="title-container">
+            <a href="/" class="home">
+              <h1>Eric Wood</h1>
+            </a>
+            <button type="button" onclick="toggleMenu()" role="menu">
+              <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 12 12"><g fill="currentColor"><path d="M.5 5.5h11v1H.5zM.5 2.5h11v1H.5zM.5 8.5h11v1H.5z"/></g></svg>
+            </button>
+          </div>
+          <nav class="hidden" role="menu">
             <ul>
               {% set active_page = active_page|default('') %}
               {% for link in nav_links %}
@@ -51,13 +56,16 @@
                     {% if active_page == link.id %}
                     class="active"
                     {% endif %}
+                    role="menuitem"
                   >{{ link.label }}</a>
                 </li>
               {% endfor %}
             </ul>
           </nav>
         </header>
-        {% block body %}{% endblock %}
+        <main role="main">
+          {% block body %}{% endblock %}
+        </main>
       </div>
       <footer>
         <div class="footer__links">
@@ -93,6 +101,7 @@
                       data-background="{{ theme[1] }}"
                       style="background-color: {{ theme[0] }}"
                       onclick="setTheme(this)"
+                      aria-label="Theme {{ theme[0] }}"
                     >
                     </button>
                   {% endfor %}

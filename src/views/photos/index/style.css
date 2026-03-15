@@ -155,7 +155,7 @@
 @media (max-width: 700px) {
   .photos__layout {
     flex-direction: column;
-    padding: 30px;
+    padding: 20px;
   }
 
   .photos__nav {
