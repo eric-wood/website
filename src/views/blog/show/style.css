@@ -74,6 +74,7 @@
 .blog__body pre > code {
   position: relative;
   display: block;
+  overflow-x: auto;
 }
 
 .blog__body code {
@@ -129,9 +130,17 @@
   opacity: 0.75;
 }
 
-@media (max-width: 850px) {
+@media (max-width: 900px) {
   .page-title {
     margin-top: 0;
     font-size: 22pt;
+  }
+
+  .blog__toc {
+    display: none;
+  }
+
+  .blog__header {
+    margin-top: 20px;
   }
 }
