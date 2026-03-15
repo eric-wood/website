@@ -133,7 +133,7 @@ fn photo_url(filename: String) -> String {
 }
 
 fn assets_path(path: String) -> String {
-    format!("/photos/assets/{path}")
+    format!("/assets/{path}")
 }
 
 fn year() -> String {

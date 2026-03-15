@@ -81,7 +81,7 @@ async fn main() -> anyhow::Result<()> {
     let reloader = load_templates_dyn(&config);
     let app = Router::new()
         .nest_service(
-            "/photos/assets",
+            "/assets",
             ServiceBuilder::new()
                 .layer(cache(ONE_YEAR))
                 .service(ServeDir::new(&config.assets_path)),
@@ -99,7 +99,7 @@ async fn main() -> anyhow::Result<()> {
                 .service(ServeDir::new(&config.photos_image_path)),
         )
         .nest_service(
-            "/assets",
+            "/content/assets",
             ServiceBuilder::new()
                 .layer(cache(ONE_YEAR))
                 .service(ServeDir::new(&config.content_assets_path)),
