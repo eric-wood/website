@@ -23,7 +23,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use crate::{
     AppState,
     date_time::DateTime,
-    views::{View, blog::BlogShow},
+    views::{View, blog::BlogShow, projects::ProjectsShow},
 };
 
 pub struct PostStore {
@@ -391,8 +391,18 @@ pub fn cache_posts(state: &AppState) -> anyhow::Result<()> {
         return Ok(());
     }
 
+    fs::create_dir_all(Path::new(&state.config.cache_path).join("blog"))?;
     for post in state.blog_store.all() {
         let view = BlogShow::new(post.clone());
+        let rendered = view.render(&state.reloader)?;
+
+        let mut file = File::create(post.cache_path.clone())?;
+        file.write_all(rendered.as_bytes())?;
+    }
+
+    fs::create_dir_all(Path::new(&state.config.cache_path).join("projects"))?;
+    for post in state.project_store.all() {
+        let view = ProjectsShow::new(post.clone());
         let rendered = view.render(&state.reloader)?;
 
         let mut file = File::create(post.cache_path.clone())?;
