@@ -3117,39 +3117,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "photos"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "arborium",
- "axum",
- "axum-extra",
- "axum-tracing-opentelemetry",
- "chrono",
- "chrono-tz",
- "comrak",
- "dotenvy",
- "html-escape",
- "init-tracing-opentelemetry",
- "minijinja",
- "minijinja-autoreload",
- "regex",
- "serde",
- "serde_html_form",
- "serde_valid",
- "serde_yaml",
- "slug",
- "sqlx",
- "sysinfo",
- "thiserror 2.0.17",
- "tokio",
- "tower",
- "tower-http",
- "tracing",
- "urlencoding",
-]
-
-[[package]]
 name = "pin-project"
 version = "1.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4876,6 +4843,39 @@ checksum = "5a6580f308b1fad9207618087a65c04e7a10bc77e02c8e84e9b00dd4b12fa0bb"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "website"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arborium",
+ "axum",
+ "axum-extra",
+ "axum-tracing-opentelemetry",
+ "chrono",
+ "chrono-tz",
+ "comrak",
+ "dotenvy",
+ "html-escape",
+ "init-tracing-opentelemetry",
+ "minijinja",
+ "minijinja-autoreload",
+ "regex",
+ "serde",
+ "serde_html_form",
+ "serde_valid",
+ "serde_yaml",
+ "slug",
+ "sqlx",
+ "sysinfo",
+ "thiserror 2.0.17",
+ "tokio",
+ "tower",
+ "tower-http",
+ "tracing",
+ "urlencoding",
 ]
 
 [[package]]
