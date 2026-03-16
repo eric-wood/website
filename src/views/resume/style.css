@@ -52,7 +52,7 @@ section ul {
 section > ul {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 20px;
   margin: 10px 0;
   list-style-type: none;
   padding: 0;

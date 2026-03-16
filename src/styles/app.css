@@ -211,7 +211,7 @@ footer {
   width: 16px;
   height: 16px;
   appearance: none;
-  border: none;
+  border: solid var(--foreground) 1px;
 }
 
 .theme-swatch.selected {
