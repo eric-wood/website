@@ -94,6 +94,9 @@
                       class="theme-swatch"
                       data-foreground="{{ theme[0] }}"
                       data-background="{{ theme[1] }}"
+                      {% if theme[2] %}
+                      data-percentage="{{ theme[2] }}"
+                      {% endif %}
                       style="background-color: {{ theme[0] }}"
                       onclick="setTheme(this)"
                       aria-label="Theme {{ theme[0] }}"

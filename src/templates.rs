@@ -71,12 +71,12 @@ pub fn load_templates_dyn(config: &Config) -> AutoReloader {
         env.add_global(
             "themes",
             Value::from_serialize([
-                ("black", "white"),
-                ("white", "black"),
-                ("firebrick", "whitesmoke"),
-                ("lightgreen", "darkslategray"),
-                ("pink", "rebeccapurple"),
-                ("midnightblue", "aliceblue"),
+                ("black", "white", None),
+                ("white", "black", Some(16)),
+                ("firebrick", "whitesmoke", None),
+                ("lightgreen", "darkslategray", None),
+                ("pink", "rebeccapurple", None),
+                ("midnightblue", "aliceblue", None),
             ]),
         );
 

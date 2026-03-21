@@ -84,8 +84,10 @@ window.setTheme = (el) => {
 
   const foreground = el.dataset.foreground;
   const background = el.dataset.background;
+  const percentage = el.dataset.percentage ?? "6";
   document.documentElement.style.setProperty("--foreground", foreground);
   document.documentElement.style.setProperty("--background", background);
+  document.documentElement.style.setProperty("--light", `color-mix(in srgb, var(--foreground) ${percentage}%, transparent)`);
 
   localStorage.setItem("theme", foreground);
 }
