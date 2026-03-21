@@ -59,6 +59,11 @@
 .blog__body {
   max-width: 620px;
   width: 100%;
+  padding-top: 30px;
+}
+
+.blog__body > *:first-child {
+  margin-top: 0;
 }
 
 .blog__body p {
