@@ -11,17 +11,18 @@ use crate::{
 
 pub struct BlogShow {
     post: Arc<Post>,
+    assets_path: String,
 }
 
 impl BlogShow {
-    pub fn new(post: Arc<Post>) -> Self {
-        Self { post }
+    pub fn new(post: Arc<Post>, assets_path: String) -> Self {
+        Self { post, assets_path }
     }
 }
 
 impl View for BlogShow {
     fn render(&self, reloader: &AutoReloader) -> anyhow::Result<String> {
-        let (body, toc) = render_post(&self.post.file_path)?;
+        let (body, toc) = render_post(&self.post.file_path, &self.assets_path)?;
         let has_code = body.contains("<pre class=\"highlighted\">");
         let toc_html = render_toc(toc);
         let html = render(

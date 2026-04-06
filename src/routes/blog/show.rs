@@ -17,7 +17,7 @@ pub async fn show(Path(slug): Path<String>, State(state): State<Arc<AppState>>) 
         return Ok(Html(html));
     }
 
-    let view = BlogShow::new(post);
+    let view = BlogShow::new(post, state.config.content_assets_path.clone());
     let html = view.render(&state.reloader)?;
 
     Ok(Html(html))

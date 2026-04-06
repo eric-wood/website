@@ -10,11 +10,14 @@ use std::{
 
 use arborium::Highlighter;
 use comrak::{
-    Arena,
+    Arena, Node,
     adapters::{HeadingAdapter, HeadingMeta, SyntaxHighlighterAdapter},
     arena_tree::NodeEdge,
-    html::format_document_with_plugins,
-    nodes::{AstNode, NodeValue, Sourcepos},
+    create_formatter,
+    html::{
+        ChildRendering, Context, dangerous_url, format_document_with_plugins, render_sourcepos,
+    },
+    nodes::{AstNode, NodeLink, NodeValue, Sourcepos},
     options, parse_document,
 };
 use regex::Regex;
@@ -344,7 +347,7 @@ fn fix_sections(body: &str) -> String {
     result
 }
 
-pub fn render_post(path: &PathBuf) -> anyhow::Result<(String, Vec<Section>)> {
+pub fn render_post(path: &PathBuf, assets_path: &str) -> anyhow::Result<(String, Vec<Section>)> {
     let md = read_to_string(path)?;
     let syntax_adapter = SyntaxAdapter::new();
     let heading_adapter = LinkedHeadingAdapter;
@@ -376,11 +379,84 @@ pub fn render_post(path: &PathBuf) -> anyhow::Result<(String, Vec<Section>)> {
     let root = parse_document(&arena, &md, &options);
     let toc = create_toc(root);
 
+    create_formatter!(Formatter<String>, {
+        NodeValue::Image(ref nl) => |context, node, entering| {
+            format_image(context, node, entering, nl, context.user.clone()).expect("failed to format image");
+        },
+    });
+
     let mut body = String::new();
-    format_document_with_plugins(root, &options, &mut body, &plugins)?;
+    Formatter::format_document_with_plugins(
+        root,
+        &options,
+        &mut body,
+        &plugins,
+        assets_path.to_string().clone(),
+    )?;
     body = fix_sections(&body);
 
     Ok((body, toc))
+}
+
+fn format_image<T>(
+    context: &mut Context<T>,
+    node: Node<'_>,
+    entering: bool,
+    nl: &NodeLink,
+    assets_path: String,
+) -> Result<ChildRendering, fmt::Error> {
+    let is_svg = nl.url.ends_with(".svg");
+    let url = &nl.url;
+    if entering {
+        if context.options.render.figure_with_caption {
+            context.write_str("<figure>")?;
+        }
+        if is_svg {
+            context.write_str("<svg title=\"")?;
+            return Ok(ChildRendering::HTML);
+        } else {
+            context.write_str("<img")?;
+            render_sourcepos(context, node)?;
+            context.write_str(" src=\"")?;
+            if context.options.render.r#unsafe || !dangerous_url(url) {
+                if let Some(rewriter) = &context.options.extension.image_url_rewriter {
+                    context.escape_href(&rewriter.to_html(&nl.url))?;
+                } else {
+                    context.escape_href(url)?;
+                }
+            }
+
+            context.write_str("\" alt=\"")?;
+        }
+        Ok(ChildRendering::Plain)
+    } else {
+        if is_svg {
+            // inline SVGs
+            let svg_path = url.replace("/content/assets/", "");
+            let assets_path = Path::new(&assets_path);
+            let path = assets_path.join(svg_path);
+            let asset = read_to_string(path).expect("svg file doesn't exist");
+            context.write_str("\" ")?;
+            context.write_str(&asset.replace("<svg ", ""))?;
+        } else {
+            if !nl.title.is_empty() {
+                context.write_str("\" title=\"")?;
+                context.escape(&nl.title)?;
+            }
+
+            context.write_str("\" />")?;
+        }
+        if context.options.render.figure_with_caption {
+            if !nl.title.is_empty() {
+                context.write_str("<figcaption>")?;
+                context.escape(&nl.title)?;
+                context.write_str("</figcaption>")?;
+            }
+            context.write_str("</figure>")?;
+        };
+
+        Ok(ChildRendering::HTML)
+    }
 }
 
 // Render all of our blog posts as fully static HTML files so we can serve them up without having
@@ -393,7 +469,7 @@ pub fn cache_posts(state: &AppState) -> anyhow::Result<()> {
 
     fs::create_dir_all(Path::new(&state.config.cache_path).join("blog"))?;
     for post in state.blog_store.all() {
-        let view = BlogShow::new(post.clone());
+        let view = BlogShow::new(post.clone(), state.config.content_assets_path.clone());
         let rendered = view.render(&state.reloader)?;
 
         let mut file = File::create(post.cache_path.clone())?;
@@ -402,7 +478,7 @@ pub fn cache_posts(state: &AppState) -> anyhow::Result<()> {
 
     fs::create_dir_all(Path::new(&state.config.cache_path).join("projects"))?;
     for post in state.project_store.all() {
-        let view = ProjectsShow::new(post.clone());
+        let view = ProjectsShow::new(post.clone(), state.config.content_assets_path.clone());
         let rendered = view.render(&state.reloader)?;
 
         let mut file = File::create(post.cache_path.clone())?;

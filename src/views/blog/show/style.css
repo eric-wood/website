@@ -94,7 +94,7 @@
   aspect-ratio: 560 / 315;
 }
 
-.blog__body img {
+.blog__body figure img, .blog__body figure svg {
   width: 100%;
   max-width: 100%;
 }
