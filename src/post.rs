@@ -14,9 +14,7 @@ use comrak::{
     adapters::{HeadingAdapter, HeadingMeta, SyntaxHighlighterAdapter},
     arena_tree::NodeEdge,
     create_formatter,
-    html::{
-        ChildRendering, Context, dangerous_url, format_document_with_plugins, render_sourcepos,
-    },
+    html::{ChildRendering, Context, dangerous_url, render_sourcepos},
     nodes::{AstNode, NodeLink, NodeValue, Sourcepos},
     options, parse_document,
 };
